@@ -1,0 +1,24 @@
+[
+    {
+        "id": "bar",
+        "animation": "rainbow",
+        "animationValue": 0,
+        "animationValueAlt": 0,
+        "animationIndex": 0,
+        "fadeDirection": true,
+        "brightness": 100,
+        "ledCount": 100,
+        "offset": 0
+    },
+    {
+        "id": "walls",
+        "animation": "solid",
+        "animationValue": 16711680,
+        "animationValueAlt": 0,
+        "animationIndex": 0,
+        "fadeDirection": true,
+        "brightness": 100,
+        "ledCount": 20,
+        "offset": 100
+    }
+]
