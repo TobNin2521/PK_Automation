@@ -1,4 +1,4 @@
-var __deployment = false;
+var __deployment = true;
 
 var express = require("express");
 var app = express();

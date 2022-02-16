@@ -1,8 +1,8 @@
-//var gpio = require("rpi-gpio");
+var gpio = require("rpi-gpio");
 var used_Gpios = [7, 9, 10, 13];
 
 for (var gpio in used_Gpios) {
-    gpio.setup(gpio, gpio.DIR_OUT);
+    //gpio.setup(gpio, gpio.DIR_OUT);
 }
 
 function relays() {

@@ -1,7 +1,7 @@
 const { off } = require("process");
 
 var NUM_LEDS = 144;
-//var ws281x = require("rpi-ws281x-native-fixed");
+var ws281x = require("rpi-ws281x-native-fixed");
 
 const channel = ws281x(NUM_LEDS, 
     {
@@ -48,22 +48,25 @@ var TwinkleColors = [
 
 function strip() {
     this.Start = function(data) {
-        stripData = data;
+        stripData = JSON.parse(data);
         this.StripTick();
     };
     this.StripTick = function() {
-        for(var config in stripData) {
+        var _this = this;
+        for(n = 0; n < stripData.length; n++) {
+            var config = stripData[n]; 
             var numLeds = config.ledCount;
             var offset = config.offset;
             switch(config.animation) {
                 case "rainbow":
                     for (let i = offset; i < numLeds; i++) {
-                        channel.array[i] = colorwheel((config.animationIndex + i) % 256);
+                        var color = _this.ColorWheel((config.animationIndex + i) % 256);
+                        channel.array[i] = color;
                     }
                     config.animationIndex = (config.animationIndex + 1) % 256;
                     break;
                 case "solid":
-                    for (let i = offset; i < numLeds; i++) {
+                    for (let i = offset; i < offset + numLeds; i++) {
                         channel.array[i] = config.animationValue;
                     } 
                     break;
@@ -81,7 +84,7 @@ function strip() {
                     var b = ((this.Int2B(fadeColor1) * (255 - config.animationIndex)) + (this.Int2B(fadeColor2) * config.animationIndex)) / 255;
 
                     
-                    for (let i = offset; i < numLeds; i++) {
+                    for (let i = offset; i < offset + numLeds; i++) {
                         channel.array[i] = this.Rgb2Int(r, g, b);
                     }
                     if(config.animationIndex == 255) config.fadeDirection = !config.fadeDirection;
@@ -92,12 +95,10 @@ function strip() {
                     var iterationIndex = 0;
                     var ledIndex = 0;
                     var intervalCount = 0;
-                    var _this = this;
-
                     var interval = setInterval(function() {                       
                         if (iterationIndex < maxIterations) {
                             if (ledIndex < numLeds) {
-                                channel.array[i] = _this.ColorWheel(
+                                channel.array[offset + ledIndex] = _this.ColorWheel(
                                     ((ledIndex * 256) / numLeds + iterationIndex) & 255
                                 );
                 
@@ -111,6 +112,7 @@ function strip() {
                             iterationIndex = 0;
                         } 
                         intervalCount++;
+                        ws281x.render();
                         if(intervalCount > 49) {
                             clearInterval(interval);
                         }
@@ -131,7 +133,7 @@ function strip() {
                             for (var x = 0; x < numLeds; x++) {
                                 var init = this.getRandomInt(0, TwinkleColors.length - 1);
                                 LastStates[x] = TwinkleColors[init];
-                                channel.array[x] = LastStates[x];
+                                channel.array[offset + x] = LastStates[x];
                             }            
                             WasTwinkling = true;
                         } else {
@@ -147,7 +149,7 @@ function strip() {
                                         newColor = TwinkleColors[ind + 1];
                                     }
                                     LastStates[x] = newColor;
-                                    channel.array[x] = LastStates[x];
+                                    channel.array[offset + x] = LastStates[x];
                                 }
                             }
                         }
@@ -162,7 +164,9 @@ function strip() {
         }
 
         ws281x.render();
-        setTimeout(this.StripTick, 50);
+        setTimeout(function(){
+            _this.StripTick();
+        }, 50);
     };
     this.Update = function(data) {
         

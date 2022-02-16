@@ -7,18 +7,51 @@
         "animationIndex": 0,
         "fadeDirection": true,
         "brightness": 100,
-        "ledCount": 100,
+        "ledCount": 10,
         "offset": 0
     },
     {
         "id": "walls",
         "animation": "solid",
-        "animationValue": 16711680,
+        "animationValue": 15728655,
         "animationValueAlt": 0,
         "animationIndex": 0,
         "fadeDirection": true,
         "brightness": 100,
-        "ledCount": 20,
-        "offset": 100
+        "ledCount": 10,
+        "offset": 10
+    },
+    {
+        "id": "billard",
+        "animation": "fade",
+        "animationValue": 15728655,
+        "animationValueAlt": 900000,
+        "animationIndex": 0,
+        "fadeDirection": true,
+        "brightness": 100,
+        "ledCount": 10,
+        "offset": 20
+    },
+    {
+        "id": "glasses",
+        "animation": "dance",
+        "animationValue": 0,
+        "animationValueAlt": 0,
+        "animationIndex": 0,
+        "fadeDirection": true,
+        "brightness": 100,
+        "ledCount": 10,
+        "offset": 30
+    },
+    {
+        "id": "door",
+        "animation": "twinkle",
+        "animationValue": [],
+        "animationValueAlt": 0,
+        "animationIndex": 0,
+        "fadeDirection": false,
+        "brightness": 100,
+        "ledCount": 10,
+        "offset": 40
     }
 ]
