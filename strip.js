@@ -7,7 +7,7 @@ const channel = ws281x(NUM_LEDS,
     {
         stripType: "ws2812", 
         gpio: 18, 
-        brightness: 150
+        brightness: 20
     });
 
 var stripData = [];
@@ -92,13 +92,14 @@ function strip() {
                     break;
                 case "dance":
                     var maxIterations = 255;
-                    var iterationIndex = 0;
-                    var ledIndex = 0;
+                    var iterationIndex = config.animationIndex;
+                    var ledIndex = config.animationValue;
                     var intervalCount = 0;
+                    _offset = config.offset;
                     var interval = setInterval(function() {                       
                         if (iterationIndex < maxIterations) {
                             if (ledIndex < numLeds) {
-                                channel.array[offset + ledIndex] = _this.ColorWheel(
+                                channel.array[_offset + ledIndex] = _this.ColorWheel(
                                     ((ledIndex * 256) / numLeds + iterationIndex) & 255
                                 );
                 
@@ -133,6 +134,7 @@ function strip() {
                             for (var x = 0; x < numLeds; x++) {
                                 var init = this.getRandomInt(0, TwinkleColors.length - 1);
                                 LastStates[x] = TwinkleColors[init];
+                                //console.log(offset + x);
                                 channel.array[offset + x] = LastStates[x];
                             }            
                             WasTwinkling = true;
@@ -149,6 +151,7 @@ function strip() {
                                         newColor = TwinkleColors[ind + 1];
                                     }
                                     LastStates[x] = newColor;
+                                    //console.log(offset + x);
                                     channel.array[offset + x] = LastStates[x];
                                 }
                             }
