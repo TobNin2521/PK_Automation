@@ -51,6 +51,13 @@ function strip() {
         stripData = JSON.parse(data);
         this.StripTick();
     };
+    this.SetBrightness = function(brigthness) {
+        if(typeof(brigthness) != "number") brightness = 200;
+        if(brightness < 0) brightness = 0;
+        if(brigthness > 255) brigthness = 255;
+        console.log("Set brightness to " + brigthness);
+        channel.brightness = brigthness;
+    };
     this.StripTick = function() {
         var _this = this;
         for(n = 0; n < stripData.length; n++) {
@@ -172,7 +179,10 @@ function strip() {
         }, 50);
     };
     this.Update = function(data) {
+        var tmpData = JSON.parse(data);
+        //verify Data
         
+        stripData = tmpData;
     };
     this.ColorWheel = function (pos) {
         pos = 255 - pos;

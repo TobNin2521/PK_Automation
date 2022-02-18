@@ -1,4 +1,4 @@
-var __deployment = true;
+var __deployment = false;
 
 var express = require("express");
 var app = express();
@@ -7,7 +7,7 @@ var path = require("path");
 var os = require('os');
 const { resolveAny } = require("dns");
 
-app.use(express.static(__dirname + "/public"));
+app.use(express.static(__dirname + "/public/dist/build"));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
@@ -19,7 +19,8 @@ if(__deployment) {
     relays = require("./relays.js");
 }
 fs = require("fs");
-var stripData = fs.readFileSync("./config/default.json", "utf8");
+var stripData = fs.readFileSync("./config/leds.json", "utf8");
+var relayData = fs.readFileSync("./config/lights.json", "utf8");
 
 var HTTP_PORT = 8080;
 var localAddress = "";
@@ -38,8 +39,24 @@ if(localAddress == "") {
 
 app.post("/leds", function (request, response) {
 	response.header("Access-Control-Allow-Origin", "*");
+    var id = request.body.id;
+    var animation = request.body.animation;
+    var animationValue = request.body.animationValue;
+    var animationValueAlt = request.body.animationValueAlt;
 
-	
+    var tmpData = JSON.parse(stripData);
+    for(var config in tmpData) {
+        if(config.id == id) {
+            config.animation = animation ? animation : "rainbow";
+            config.animationValue = animationValue ? animationValue : 0;
+            config.animationValueAlt = animationValueAlt ? animationValueAlt : 0;
+        }
+    }
+    stripData = JSON.stringify(tmpData);
+
+    if(__deployment) {
+        strip.Update(stripData);
+    }
 });
 
 app.post("/lights", function (request, response) {
@@ -47,15 +64,28 @@ app.post("/lights", function (request, response) {
 
 });
 
-app.get("/", function (req, res) {
-	res.header("Access-Control-Allow-Origin", "*");
-	res.sendFile(path.join(__dirname + "/app.html"));
+app.post("/brightness", function (request, response) {
+	response.header("Access-Control-Allow-Origin", "*");
+    if(__deployment) {
+        strip.SetBrightness(request.body.brightness);
+    }	
 });
 
-app.get("/config", function (req, res) {
+app.get("/", function (req, res) {
 	res.header("Access-Control-Allow-Origin", "*");
-    stripData = fs.readFileSync("./config/default.json", "utf8");
+	res.sendFile(path.join(__dirname + "/public/dev/dist/build/index.html"));
+});
+
+app.get("/config/leds", function (req, res) {
+	res.header("Access-Control-Allow-Origin", "*");
+    stripData = fs.readFileSync("./config/leds.json", "utf8");
     res.send(stripData);
+});
+
+app.get("/config/lights", function (req, res) {
+	res.header("Access-Control-Allow-Origin", "*");
+    relayData = fs.readFileSync("./config/lights.json", "utf8");
+    res.send(relayData);
 });
 
 var server = app.listen(HTTP_PORT, function () {
@@ -66,5 +96,6 @@ var server = app.listen(HTTP_PORT, function () {
 	console.log("***********************************************************************");
     if(__deployment) {
         strip.Start(stripData);
+        relays.Start(relayData);
     }
 });

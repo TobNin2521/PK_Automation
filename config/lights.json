@@ -1,0 +1,10 @@
+[
+    {
+        "id": "bar",
+        "state": true
+    },
+    {
+        "id": "billard",
+        "state": false
+    }
+]

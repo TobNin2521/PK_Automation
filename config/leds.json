@@ -6,7 +6,6 @@
         "animationValueAlt": 0,
         "animationIndex": 0,
         "fadeDirection": true,
-        "brightness": 100,
         "ledCount": 10,
         "offset": 0
     },
@@ -17,7 +16,6 @@
         "animationValueAlt": 0,
         "animationIndex": 0,
         "fadeDirection": true,
-        "brightness": 100,
         "ledCount": 10,
         "offset": 10
     },
@@ -28,7 +26,6 @@
         "animationValueAlt": 900000,
         "animationIndex": 0,
         "fadeDirection": true,
-        "brightness": 100,
         "ledCount": 10,
         "offset": 20
     },
@@ -39,7 +36,6 @@
         "animationValueAlt": 0,
         "animationIndex": 0,
         "fadeDirection": true,
-        "brightness": 100,
         "ledCount": 10,
         "offset": 30
     },
@@ -50,7 +46,6 @@
         "animationValueAlt": 0,
         "animationIndex": 0,
         "fadeDirection": false,
-        "brightness": 100,
         "ledCount": 10,
         "offset": 40
     }

@@ -6,6 +6,9 @@ for (var gpio in used_Gpios) {
 }
 
 function relays() {
+    this.Start = function(relayData) {
+
+    };
     this.Update = function() {
 
     };
