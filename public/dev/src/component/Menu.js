@@ -1,4 +1,5 @@
 import React from "react";
+import "./Menu.css";
 
 export default class Menu extends React.Component {
     constructor(props) {
@@ -7,7 +8,7 @@ export default class Menu extends React.Component {
 
     render() {    
         return (
-            <div className="menu-containter">
+            <div className="menu-container">
                 <div className="menu-item" onClick={ () => this.props.callback("lights") }>
                     Lights
                 </div>

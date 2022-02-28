@@ -1,0 +1,18 @@
+.menu-container {
+    height: 10vh;
+    width: 100vw;
+    line-height: 10vh;
+    background-color: #cecece;
+}
+.menu-item {
+    height: 10vh;
+    width: 25vw;
+    display: inline-block;
+    font-size: 5vh;
+    text-align: center;
+    border-right: 2px solid black;
+    cursor: pointer;
+}
+.menu-item:hover {
+    background-color: #a3a3a3;
+}

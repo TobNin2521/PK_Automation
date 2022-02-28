@@ -1,10 +1,12 @@
 [
     {
         "id": "bar",
+        "pin": 5,
         "state": true
     },
     {
         "id": "billard",
+        "pin": 6,
         "state": false
     }
 ]

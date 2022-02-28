@@ -1,6 +1,4 @@
-const { off } = require("process");
-
-var NUM_LEDS = 144;
+var NUM_LEDS = 144; //FOR TESTING: TO CHANGE
 var ws281x = require("rpi-ws281x-native-fixed");
 
 const channel = ws281x(NUM_LEDS, 
@@ -48,14 +46,14 @@ var TwinkleColors = [
 
 function strip() {
     this.Start = function(data) {
-        stripData = JSON.parse(data);
+        stripData = data;
         this.StripTick();
     };
     this.SetBrightness = function(brigthness) {
         if(typeof(brigthness) != "number") brightness = 200;
         if(brightness < 0) brightness = 0;
         if(brigthness > 255) brigthness = 255;
-        console.log("Set brightness to " + brigthness);
+        console.log("Set brightness to " + brigthness + " (0-255)");
         channel.brightness = brigthness;
     };
     this.StripTick = function() {
@@ -130,7 +128,7 @@ function strip() {
                     config.animationValue = ledIndex;
                     break;
                 case "twinkle":
-                    if(typeof(config.animationValue) == "number"){
+                    if(typeof(config.animationValue) == "number") {
                         config.animationValue = [];
                     }
                     if(config.animationIndex == 0){
@@ -141,7 +139,6 @@ function strip() {
                             for (var x = 0; x < numLeds; x++) {
                                 var init = this.getRandomInt(0, TwinkleColors.length - 1);
                                 LastStates[x] = TwinkleColors[init];
-                                //console.log(offset + x);
                                 channel.array[offset + x] = LastStates[x];
                             }            
                             WasTwinkling = true;
@@ -158,7 +155,6 @@ function strip() {
                                         newColor = TwinkleColors[ind + 1];
                                     }
                                     LastStates[x] = newColor;
-                                    //console.log(offset + x);
                                     channel.array[offset + x] = LastStates[x];
                                 }
                             }
@@ -181,7 +177,13 @@ function strip() {
     this.Update = function(data) {
         var tmpData = JSON.parse(data);
         //verify Data
-        
+        for(n = 0; n < tmpData.length; n++) {
+            var _config = tmpData[n];
+            if (_config.animation == "twinkle"){
+                if(typeof(_config.animationValue) == "number") _config.animationValue = [];
+            }
+        }
+
         stripData = tmpData;
     };
     this.ColorWheel = function (pos) {
