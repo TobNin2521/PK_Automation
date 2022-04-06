@@ -1,7 +1,10 @@
 var __deployment = false;
+var __useSSL = true;
 
 var express = require("express");
 var app = express();
+var http = require('http');
+var https = require('https');
 var bodyParser = require("body-parser");
 var path = require("path");
 var os = require('os');
@@ -18,11 +21,12 @@ if(__deployment) {
     strip = require("./strip.js");
     relays = require("./relays.js");
 }
-fs = require("fs");
+var fs = require("fs");
 var stripData = JSON.parse(fs.readFileSync("./config/leds.json", "utf8"));
 var relayData = JSON.parse(fs.readFileSync("./config/lights.json", "utf8"));
 
 var HTTP_PORT = 8080;
+var HTTPS_PORT = 8443;
 var localAddress = "";
 if(localAddress == "") {    
     var interfaces = os.networkInterfaces();
@@ -147,14 +151,37 @@ app.get("/config/lights", function (req, res) {
     res.send(JSON.stringify(relayData));
 });
 
-var server = app.listen(HTTP_PORT, function () {
-	console.log("***********************************************************************");
-	console.log(" PK Automation ");
-	console.log(" Web Server listening at the location below, or by host name and port. ");
-	console.log(" http://" + localAddress + ":" + HTTP_PORT);
-	console.log("***********************************************************************");
-    if(__deployment) {
-        strip.Start(stripData);
-        relays.Start(relayData);
-    }
-});
+var privateKey  = fs.readFileSync('sslcert/server.key', 'utf8');
+var certificate = fs.readFileSync('sslcert/server.crt', 'utf8');
+
+var credentials = {key: privateKey, cert: certificate};
+
+var httpServer = http.createServer(app);
+var httpsServer = https.createServer(credentials, app);
+
+if(__useSSL){
+    var server = httpsServer.listen(HTTPS_PORT, function () {
+        console.log("***********************************************************************");
+        console.log(" PK Automation ");
+        console.log(" Web Server listening at the location below, or by host name and port. ");
+        console.log(" https://" + localAddress + ":" + HTTPS_PORT);
+        console.log("***********************************************************************");
+        if(__deployment) {
+            strip.Start(stripData);
+            relays.Start(relayData);
+        }
+    });
+}
+else{
+    var server = httpServer.listen(HTTP_PORT, function () {
+        console.log("***********************************************************************");
+        console.log(" PK Automation ");
+        console.log(" Web Server listening at the location below, or by host name and port. ");
+        console.log(" http://" + localAddress + ":" + HTTP_PORT);
+        console.log("***********************************************************************");
+        if(__deployment) {
+            strip.Start(stripData);
+            relays.Start(relayData);
+        }
+    });
+}
