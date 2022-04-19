@@ -11,7 +11,7 @@ To start the webserver use the command
 
 `node .\app.js`
 
-in the parent director of the project. This project contains the webserver and the UX for the displayed website.
+in the parent directory of the project. This project contains the webserver and the UX for the displayed website.
 The website is written with the react-framework, to start the development enviroment use the command
 
 `npm start`
@@ -39,3 +39,4 @@ On project setup use the command `npm install` to install all libraries.
 ## Infos
 
 Selfsigning SSL cert: [Click here](https://stackoverflow.com/questions/11744975/enabling-https-on-express-js)
+Progressive Web Apps: [Click here](https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps)
