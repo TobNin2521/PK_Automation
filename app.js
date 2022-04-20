@@ -1,5 +1,5 @@
 var __deployment = false;
-var __useSSL = true;
+var __useSSL = false;
 
 var express = require("express");
 var app = express();
@@ -22,6 +22,7 @@ if(__deployment) {
     relays = require("./relays.js");
 }
 var fs = require("fs");
+const { response } = require("express");
 var stripData = JSON.parse(fs.readFileSync("./config/leds.json", "utf8"));
 var relayData = JSON.parse(fs.readFileSync("./config/lights.json", "utf8"));
 
@@ -149,6 +150,61 @@ app.get("/config/lights", function (req, res) {
 	res.header("Access-Control-Allow-Origin", "*");
     relayData = JSON.parse(fs.readFileSync("./config/lights.json", "utf8"));
     res.send(JSON.stringify(relayData));
+});
+
+app.get("/profiles", function (req, res) {
+	res.header("Access-Control-Allow-Origin", "*");    
+    res.send(JSON.stringify(fs.readdirSync("./profiles/")));
+});
+
+app.post("/profiles/set", function (request, response) {
+	response.header("Access-Control-Allow-Origin", "*");
+    var profile = request.body.profile;
+    console.log(" > Set Profile");
+    console.log(" >> Profile: " + profile);
+
+    let profileData = JSON.parse(fs.readFileSync("./profiles/" + profile, "utf8"));
+
+    let ledData = JSON.stringify(profileData.leds);
+    let ioData = JSON.stringify(profileData.lights);
+    
+    if(__deployment) {
+        strip.Update(ledData);
+        relays.Update(ioData);
+        stripData = ledData;
+        relayData = ioData;
+    }
+
+    //TODO: Write configuration to files
+    
+    response.status(200).send({result: "success"});	
+});
+
+app.post("/profiles/savecurrent", function (request, response) {
+	response.header("Access-Control-Allow-Origin", "*");
+
+    let newProfile = {
+        "leds": [],
+        "lights": []
+    };
+    let profileName = request.body.profileName;
+
+    if(typeof(stripData) == "string") {
+        newProfile.leds = JSON.parse(stripData);
+    }
+    else {
+        newProfile.leds = stripData;
+    }
+    if(typeof(relayData) == "string") {
+        newProfile.lights = JSON.parse(relayData);
+    }
+    else {
+        newProfile.lights = relayData;
+    }
+
+    fs.writeFileSync("./profiles/" + profileName + ".json", newProfile);
+    
+    response.status(200).send({result: "success"});	
 });
 
 var privateKey  = fs.readFileSync('sslcert/server.key', 'utf8');

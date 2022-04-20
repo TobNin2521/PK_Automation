@@ -58,20 +58,8 @@ export default class Leds extends React.Component {
     }
 
     onSendConfig = (event) => {
-        this.apiPost(window.location.origin + "/leds", { id: this.state.ledId, animation: this.state.animation, animationValue: this.state.colorOne, animationValueAlt: this.state.colorTwo });
-        this.apiPost(window.location.origin + "/brightness", { brightness: Number(this.state.brightness) });
-    }
-
-    apiPost = (url, data) => {
-        fetch(url, {
-            method: "POST",
-            body: JSON.stringify({
-                data: data
-            }),            
-            headers: {"Content-Type": "application/json"}
-        }).then(res => {
-            console.log(res);
-        });
+        this.props.post(window.location.origin + "/leds", { id: this.state.ledId, animation: this.state.animation, animationValue: this.state.colorOne, animationValueAlt: this.state.colorTwo });
+        this.props.post(window.location.origin + "/brightness", { brightness: Number(this.state.brightness) });
     }
 
     render() {

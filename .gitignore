@@ -88,3 +88,5 @@ typings/
 .dynamodb/
 
 public/dev/.vscode/
+
+public/dist/build/

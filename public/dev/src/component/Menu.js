@@ -15,6 +15,9 @@ export default class Menu extends React.Component {
                 <div className="menu-item" onClick={ () => this.props.callback("leds") }>
                     Leds
                 </div>
+                <div className="menu-item" onClick={ () => this.props.callback("profiles") }>
+                    Profiles
+                </div>
             </div>
         );
     }

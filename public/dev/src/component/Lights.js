@@ -34,19 +34,7 @@ export default class Lights extends React.Component {
     }
 
     onSendConfig = (event) => {
-        this.apiPost(window.location.origin + "/lights", { id: this.state.lightId, state: this.state.state });
-    }
-
-    apiPost = (url, data) => {
-        fetch(url, {
-            method: "POST",
-            body: JSON.stringify({
-                data: data
-            }),
-            headers: {"Content-Type": "application/json"}
-        }).then(res => {
-            console.log(res);
-        });
+        this.props.post(window.location.origin + "/lights", { id: this.state.lightId, state: this.state.state });
     }
         
     render() {
