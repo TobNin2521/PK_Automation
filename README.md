@@ -30,10 +30,11 @@ The website is written with the react-framework, to start the development enviro
 `npm start`
 
 in the */public/dev* directory. Before using the new changes with the node webserver you have to **build** the react website.
-To build the react project first delete all contents in the */public/dev/dist/* directory.
 The build script will build the website and move the files to this directory. To build the website use this command
 
 `npm build`
+
+You can find the finished build in */public/dist/build*.
 
 ## External Libs
 
