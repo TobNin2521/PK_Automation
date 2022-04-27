@@ -16,7 +16,7 @@ export default class Lights extends React.Component {
     constructor (props) {
         super(props);
         this.state = {
-            lightId: "",
+            lightId: "bar",
             state: false
         }
     }
@@ -40,7 +40,7 @@ export default class Lights extends React.Component {
     render() {
         return (
         <div className="lights-containter">
-            <input type="text" placeholder="ID" id="light-id-input" onChange={this.handleLightsIdChange} />
+            <input type="text" placeholder="ID" id="light-id-input" onChange={this.handleLightsIdChange} /><span>bar / billard</span>
             <br />
             <input type="checkbox" id="light-state-input" onChange={this.handleLightsStateChange} />
             <br />

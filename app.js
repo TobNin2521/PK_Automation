@@ -1,39 +1,45 @@
-var __deployment = false;
-var __useSSL = false;
+/***************************************************************************
+ * 
+ *           Web server class for PK-Automation - Tobias Ninz
+ *              
+ **************************************************************************/
 
-var express = require("express");
-var app = express();
-var http = require('http');
-var https = require('https');
-var bodyParser = require("body-parser");
-var path = require("path");
-var os = require('os');
+let __deployment = false;
+let __useSSL = false;
+
+let express = require("express");
+let app = express();
+let http = require('http');
+let https = require('https');
+let bodyParser = require("body-parser");
+let path = require("path");
+let os = require('os');
+let fs = require("fs");
 const { resolveAny } = require("dns");
+const { response } = require("express");
 
 app.use(express.static(__dirname + "/public/dist/build"));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-var strip = null;
-var relays = null;
+let strip = null;
+let relays = null;
 
 if(__deployment) {
     strip = require("./strip.js");
     relays = require("./relays.js");
 }
-var fs = require("fs");
-const { response } = require("express");
-var stripData = JSON.parse(fs.readFileSync("./config/leds.json", "utf8"));
-var relayData = JSON.parse(fs.readFileSync("./config/lights.json", "utf8"));
+let stripData = JSON.parse(fs.readFileSync("./config/leds.json", "utf8"));
+let relayData = JSON.parse(fs.readFileSync("./config/lights.json", "utf8"));
 
-var HTTP_PORT = 8080;
-var HTTPS_PORT = 8443;
-var localAddress = "";
+let HTTP_PORT = 8080;
+let HTTPS_PORT = 8443;
+let localAddress = "";
 if(localAddress == "") {    
-    var interfaces = os.networkInterfaces();
-    for (var k in interfaces) {
-        for (var k2 in interfaces[k]) {
-            var address = interfaces[k][k2];
+    let interfaces = os.networkInterfaces();
+    for (let k in interfaces) {
+        for (let k2 in interfaces[k]) {
+            let address = interfaces[k][k2];
             if (address.family === 'IPv4' && !address.internal) {
                 localAddress = address.address;
                 break;
@@ -44,49 +50,53 @@ if(localAddress == "") {
 
 app.post("/leds", function (request, response) {
 	response.header("Access-Control-Allow-Origin", "*");
-    var id = request.body.data.id;
-    var animation = request.body.data.animation;
-    var animationValue = request.body.data.animationValue;
-    var animationValueAlt = request.body.data.animationValueAlt;
+    let id = request.body.data.id;
+    let animation = request.body.data.animation;
+    let animationValue = request.body.data.animationValue;
+    let animationValueAlt = request.body.data.animationValueAlt;
     console.log(" > Set LED config");
     console.log(" >> ID: " + id);
     console.log(" >> Animation: " + animation);
     console.log(" >> AnimationValue: " + animationValue);
     console.log(" >> AnimationValueAlt: " + animationValueAlt);
 
-    var tmpData = JSON.parse(stripData);
-    for(var config in tmpData) {
+    let tmpData = null;
+    if(typeof(stripData) == "string") {
+        tmpData = JSON.parse(stripData);
+    }
+    else {
+        tmpData = stripData;
+    }
+    for(let i = 0; i < tmpData.length; i++) {
+        let config = tmpData[i];
         if(config.id == id) {
             config.animation = animation ? animation : "rainbow";
+            console.log(" > Update strip config of id " + config.id + " to animation " + config.animation);
+            config.animationIndex = 0;
             switch(config.animation){
                 case "rainbow":
                     config.animationValue = 0;
                     config.animationValueAlt = 0;
-                    config.animationIndex = 0;
                     config.fadeDirection = true;
                     break;
                 case "solid":
                     config.animationValue = animationValue ? animationValue : 0;
                     config.animationValueAlt = 0;
-                    config.animationIndex = 0;
                     config.fadeDirection = true;
                     break;
                 case "fade":
                     config.animationValue = animationValue ? animationValue : 0;
                     config.animationValueAlt = animationValueAlt ? animationValueAlt : 0;
-                    config.animationIndex = 0;
                     config.fadeDirection = true;
                     break;
                 case "dance":
                     config.animationValue = 0;
                     config.animationValueAlt = 0;
-                    config.animationIndex = 0;
                     config.fadeDirection = true;
                     break;
                 case "twinkle":
                     config.animationValue = [];
                     config.animationValueAlt = 0;
-                    config.animationIndex = 0;
                     config.fadeDirection = false;
                     break;
             }
@@ -95,6 +105,7 @@ app.post("/leds", function (request, response) {
     stripData = JSON.stringify(tmpData);
 
     if(__deployment) {
+        console.log(" > Send updated data to strip handler");
         strip.Update(stripData);
     }
     response.status(200).send({result: "success"});
@@ -103,14 +114,14 @@ app.post("/leds", function (request, response) {
 app.post("/lights", function (request, response) {
 	response.header("Access-Control-Allow-Origin", "*");
     console.log(response);
-    var id = request.body.data.id;
-    var state = request.body.data.state;
+    let id = request.body.data.id;
+    let state = request.body.data.state;
     console.log(" > Set Light config");
     console.log(" >> ID: " + id);
     console.log(" >> State: " + state);
 
-    var tmpData = JSON.parse(relayData);
-    for(var config in tmpData) {
+    let tmpData = JSON.parse(relayData);
+    for(let config in tmpData) {
         if(config.id == id) {
             config.state = state;
         }
@@ -126,7 +137,7 @@ app.post("/lights", function (request, response) {
 
 app.post("/brightness", function (request, response) {
 	response.header("Access-Control-Allow-Origin", "*");
-    var brightness = request.body.brightness;
+    let brightness = request.body.data.brightness;
     console.log(" > Set LED brightness");
     console.log(" >> Brightness: " + brightness);
     if(__deployment) {
@@ -159,7 +170,7 @@ app.get("/profiles", function (req, res) {
 
 app.post("/profiles/set", function (request, response) {
 	response.header("Access-Control-Allow-Origin", "*");
-    var profile = request.body.profile;
+    let profile = request.body.profile;
     console.log(" > Set Profile");
     console.log(" >> Profile: " + profile);
 
@@ -207,16 +218,16 @@ app.post("/profiles/savecurrent", function (request, response) {
     response.status(200).send({result: "success"});	
 });
 
-var privateKey  = fs.readFileSync('sslcert/server.key', 'utf8');
-var certificate = fs.readFileSync('sslcert/server.crt', 'utf8');
+let privateKey  = fs.readFileSync('sslcert/server.key', 'utf8');
+let certificate = fs.readFileSync('sslcert/server.crt', 'utf8');
 
-var credentials = {key: privateKey, cert: certificate};
+let credentials = {key: privateKey, cert: certificate};
 
-var httpServer = http.createServer(app);
-var httpsServer = https.createServer(credentials, app);
+let httpServer = http.createServer(app);
+let httpsServer = https.createServer(credentials, app);
 
 if(__useSSL){
-    var server = httpsServer.listen(HTTPS_PORT, function () {
+    let server = httpsServer.listen(HTTPS_PORT, function () {
         console.log("***********************************************************************");
         console.log(" PK Automation ");
         console.log(" Web Server listening at the location below, or by host name and port. ");
@@ -229,7 +240,7 @@ if(__useSSL){
     });
 }
 else{
-    var server = httpServer.listen(HTTP_PORT, function () {
+    let server = httpServer.listen(HTTP_PORT, function () {
         console.log("***********************************************************************");
         console.log(" PK Automation ");
         console.log(" Web Server listening at the location below, or by host name and port. ");

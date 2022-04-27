@@ -19,8 +19,8 @@ export default class Leds extends React.Component {
         super(props);        
         this.state = {
             brightness: 100,
-            ledId: "",
-            animation: "",
+            ledId: "bar",
+            animation: "rainbow",
             colorOne: 0,
             colorTwo: 0
         }
@@ -46,14 +46,13 @@ export default class Leds extends React.Component {
 
     handleColorOneChange = (event) => {
         this.setState({
-            colorTwo: parseInt(event.target.value.replace("#", "0x"))
+            colorOne: parseInt(event.target.value.replace("#", "0x"))
         });
-
     }
 
     handleColorTwoChange = (event) => {
         this.setState({
-            colorOne: parseInt(event.target.value.replace("#", "0x"))
+            colorTwo: parseInt(event.target.value.replace("#", "0x"))
         });
     }
 
@@ -70,7 +69,7 @@ export default class Leds extends React.Component {
                     <input id="led-brightness" type="range" min="0" max="255" value={this.state.brightness} onChange={this.handleBrightnessChange} step="1"/>
                 </div>
                 <div className="animation-config-container">
-                    <input type="text" placeholder="ID" id="led-id-input" onChange={this.handleLedIdChange} /><span>  bar / walls / billard / glasses / door</span>
+                    <input type="text" placeholder="ID" id="led-id-input" value="bar" onChange={this.handleLedIdChange} /><span>  bar / walls / billard / glasses / door</span>
                     <br/>
                     <select id="led-animation-select" onChange={this.handleAnimationChange}>
                         <option value="rainbow">Rainbow</option>

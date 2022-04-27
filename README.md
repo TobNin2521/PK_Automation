@@ -22,7 +22,7 @@ Here a list of components:
 
 To start the webserver use the command
 
-`node .\app.js`
+`sudo node .\app.js`
 
 in the parent directory of the project. This project contains the webserver and the UX for the displayed website.
 The website is written with the react-framework, to start the development enviroment use the command
@@ -32,7 +32,7 @@ The website is written with the react-framework, to start the development enviro
 in the */public/dev* directory. Before using the new changes with the node webserver you have to **build** the react website.
 The build script will build the website and move the files to this directory. To build the website use this command
 
-`npm build`
+`npm run build`
 
 You can find the finished build in */public/dist/build*.
 

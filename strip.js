@@ -4,9 +4,9 @@
  *              
  **************************************************************************/
 
-var NUM_LEDS = 144; //FOR TESTING: TO CHANGE
+let NUM_LEDS = 144; //FOR TESTING: TO CHANGE
 
-var ws281x = require("rpi-ws281x-native-fixed");
+let ws281x = require("rpi-ws281x-native-fixed");
 
 const channel = ws281x(NUM_LEDS, 
     {
@@ -15,8 +15,8 @@ const channel = ws281x(NUM_LEDS,
         brightness: 20
     });
 
-var stripData = [];
-var TwinkleColors = [
+let stripData = [];
+let TwinkleColors = [
     0xffffff,
     0xfcfcfc,
     0xfafafa,
@@ -51,30 +51,34 @@ var TwinkleColors = [
     0xb0b0b0,
 ];
 
+let _updateRecieved = true;
+
 function strip() {
     this.Start = function(data) {
         stripData = data;
         this.StripTick();
     };
 
-    this.SetBrightness = function(brigthness) {
-        if(typeof(brigthness) != "number") brightness = 200;
+    this.SetBrightness = function(brightness) {
+        if(typeof(brightness) != "number") brightness = 200;
         if(brightness < 0) brightness = 0;
-        if(brigthness > 255) brigthness = 255;
-        console.log("Set brightness to " + brigthness + " (0-255)");
-        channel.brightness = brigthness;
+        if(brightness > 255) brightness = 255;
+        console.log("Set brightness to " + brightness + " (0-255)");
+        channel.brightness = brightness;
     };
 
     this.StripTick = function() {
-        var _this = this;
+        let _this = this;
+        if(_updateRecieved) console.log(stripData);
+        _updateRecieved = false;
         for(n = 0; n < stripData.length; n++) {
-            var config = stripData[n]; 
-            var numLeds = config.ledCount;
-            var offset = config.offset;
+            let config = stripData[n]; 
+            let numLeds = config.ledCount;
+            let offset = config.offset;
             switch(config.animation) {
                 case "rainbow":
                     for (let i = offset; i < numLeds; i++) {
-                        var color = _this.ColorWheel((config.animationIndex + i) % 256);
+                        let color = _this.ColorWheel((config.animationIndex + i) % 256);
                         channel.array[i] = color;
                     }
                     config.animationIndex = (config.animationIndex + 1) % 256;
@@ -85,17 +89,17 @@ function strip() {
                     } 
                     break;
                 case "fade":
-                    var fadeColor1 = config.animationValue;
-                    var fadeColor2 = config.animationValueAlt;
+                    let fadeColor1 = config.animationValue;
+                    let fadeColor2 = config.animationValueAlt;
                     
                     if(!config.fadeDirection) {
                         fadeColor1 = config.animationValueAlt;
                         fadeColor2 = config.animationValue;
                     }
                     
-                    var r = ((this.Int2R(fadeColor1) * (255 - config.animationIndex)) + (this.Int2R(fadeColor2) * config.animationIndex)) / 255;
-                    var g = ((this.Int2G(fadeColor1) * (255 - config.animationIndex)) + (this.Int2G(fadeColor2) * config.animationIndex)) / 255;
-                    var b = ((this.Int2B(fadeColor1) * (255 - config.animationIndex)) + (this.Int2B(fadeColor2) * config.animationIndex)) / 255;
+                    let r = ((this.Int2R(fadeColor1) * (255 - config.animationIndex)) + (this.Int2R(fadeColor2) * config.animationIndex)) / 255;
+                    let g = ((this.Int2G(fadeColor1) * (255 - config.animationIndex)) + (this.Int2G(fadeColor2) * config.animationIndex)) / 255;
+                    let b = ((this.Int2B(fadeColor1) * (255 - config.animationIndex)) + (this.Int2B(fadeColor2) * config.animationIndex)) / 255;
 
                     
                     for (let i = offset; i < offset + numLeds; i++) {
@@ -105,12 +109,12 @@ function strip() {
                     config.animationIndex = (config.animationIndex + 1) % 256;
                     break;
                 case "dance":
-                    var maxIterations = 255;
-                    var iterationIndex = config.animationIndex;
-                    var ledIndex = config.animationValue;
-                    var intervalCount = 0;
+                    let maxIterations = 255;
+                    let iterationIndex = config.animationIndex;
+                    let ledIndex = config.animationValue;
+                    let intervalCount = 0;
                     _offset = config.offset;
-                    var interval = setInterval(function() {                       
+                    let interval = setInterval(function() {                       
                         if (iterationIndex < maxIterations) {
                             if (ledIndex < numLeds) {
                                 channel.array[_offset + ledIndex] = _this.ColorWheel(
@@ -141,23 +145,23 @@ function strip() {
                         config.animationValue = [];
                     }
                     if(config.animationIndex == 0){
-                        var WasTwinkling = config.fadeDirection;
-                        var LastStates = config.animationValue;
+                        let WasTwinkling = config.fadeDirection;
+                        let LastStates = config.animationValue;
 
                         if (!WasTwinkling) {
-                            for (var x = 0; x < numLeds; x++) {
-                                var init = this.getRandomInt(0, TwinkleColors.length - 1);
+                            for (let x = 0; x < numLeds; x++) {
+                                let init = this.getRandomInt(0, TwinkleColors.length - 1);
                                 LastStates[x] = TwinkleColors[init];
                                 channel.array[offset + x] = LastStates[x];
                             }            
                             WasTwinkling = true;
                         } else {
-                            for (var x = 0; x < numLeds; x++) {
-                                var shouldTwinkle = this.getRandomInt(0, 100);
+                            for (let x = 0; x < numLeds; x++) {
+                                let shouldTwinkle = this.getRandomInt(0, 100);
                                 if (shouldTwinkle > 10) {
-                                    var currentColor = LastStates[x];
-                                    var newColor = 0;
-                                    var ind = TwinkleColors.indexOf(currentColor);
+                                    let currentColor = LastStates[x];
+                                    let newColor = 0;
+                                    let ind = TwinkleColors.indexOf(currentColor);
                                     if (ind == TwinkleColors.length + 1) {
                                         newColor = TwinkleColors[0];
                                     } else {
@@ -185,15 +189,22 @@ function strip() {
     };
 
     this.Update = function(data) {
-        var tmpData = JSON.parse(data);
+        let tmpData = null;
+        if(typeof(data) == "string") {
+            tmpData = JSON.parse(data);
+        }
+        else {
+            tmpData = data;
+        }
         //verify Data
         for(n = 0; n < tmpData.length; n++) {
-            var _config = tmpData[n];
+            let _config = tmpData[n];
             if (_config.animation == "twinkle"){
                 if(typeof(_config.animationValue) == "number") _config.animationValue = [];
             }
         }
-
+        _updateRecieved = true;
+        console.log(" > Update strip config");
         stripData = tmpData;
     };
 
@@ -216,7 +227,7 @@ function strip() {
     };
 
     this.Int2R = function(val) {
-        var errorMessage = 'Must provide an integer between 0 and 16777215';
+        let errorMessage = 'Must provide an integer between 0 and 16777215';
         if (typeof val !== 'number') throw new Error(errorMessage);
         if (Math.floor(val) !== val) throw new Error(errorMessage);
         if (val < 0 || val > 16777215) throw new Error(errorMessage);
@@ -225,35 +236,35 @@ function strip() {
     };
     
     this.Int2G = function(val) {
-        var errorMessage = 'Must provide an integer between 0 and 16777215';
+        let errorMessage = 'Must provide an integer between 0 and 16777215';
         if (typeof val !== 'number') throw new Error(errorMessage);
         if (Math.floor(val) !== val) throw new Error(errorMessage);
         if (val < 0 || val > 16777215) throw new Error(errorMessage);
 
-        var red = val >> 16;
+        let red = val >> 16;
         return val - (red << 16) >> 8;
     };
     
     this.Int2B = function(val) {
-        var errorMessage = 'Must provide an integer between 0 and 16777215';
+        let errorMessage = 'Must provide an integer between 0 and 16777215';
         if (typeof val !== 'number') throw new Error(errorMessage);
         if (Math.floor(val) !== val) throw new Error(errorMessage);
         if (val < 0 || val > 16777215) throw new Error(errorMessage);
 
-        var red = val >> 16;
-        var green = val - (red << 16) >> 8;
+        let red = val >> 16;
+        let green = val - (red << 16) >> 8;
         return val - (red << 16) - (green << 8);
     };
 
     this.Int2Rgb = function(val) {
-        var errorMessage = 'Must provide an integer between 0 and 16777215';
+        let errorMessage = 'Must provide an integer between 0 and 16777215';
         if (typeof val !== 'number') throw new Error(errorMessage);
         if (Math.floor(val) !== val) throw new Error(errorMessage);
         if (val < 0 || val > 16777215) throw new Error(errorMessage);
         
-        var red = int >> 16;
-        var green = int - (red << 16) >> 8;
-        var blue = int - (red << 16) - (green << 8);
+        let red = int >> 16;
+        let green = int - (red << 16) >> 8;
+        let blue = int - (red << 16) - (green << 8);
 
         return {
             red: red,

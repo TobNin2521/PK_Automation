@@ -1,17 +1,28 @@
-var gpio = require("rpi-gpio");
-var relayData = [];
+/***************************************************************************
+ * 
+ *             Relay class for PK-Automation - Tobias Ninz
+ *              
+ **************************************************************************/
+
+let gpio = require("rpi-gpio");
+let relayData = [];
 
 function relays() {
     this.Start = function(_relayData) {
         relayData = _relayData;
         //First option
-        for (var config in relayData) {
+        for (let config in relayData) {
             gpio.setup(config.pin, gpio.DIR_OUT);
         }
     };
     this.Update = function(_relayData) {
-        relayData = JSON.parse(_relayData);
-        for (var config in relayData) {
+        if(typeof(_relayData)  == "string"){
+            relayData = JSON.parse(_relayData);
+        }
+        else{
+            relayData = _relayData;
+        }
+        for (let config in relayData) {
             this.Write(config.pin, config.state);
         }
     };
