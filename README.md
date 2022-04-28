@@ -5,6 +5,7 @@
 This project containts a nodejs webserver and a website build with react. The webserver uses different libraries to
 control LED-strips and GPIOs, on the website the user can configure these IOs.
 The json objects to send to the API are documented in the Leds/Lights files in the react project.
+Detailed documentation for this project is in my Evernote.
 
 ## Hardware
 

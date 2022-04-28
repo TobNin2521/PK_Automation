@@ -113,11 +113,10 @@ function strip() {
                     let iterationIndex = config.animationIndex;
                     let ledIndex = config.animationValue;
                     let intervalCount = 0;
-                    _offset = config.offset;
                     let interval = setInterval(function() {                       
                         if (iterationIndex < maxIterations) {
                             if (ledIndex < numLeds) {
-                                channel.array[_offset + ledIndex] = _this.ColorWheel(
+                                channel.array[offset + ledIndex] = _this.ColorWheel(
                                     ((ledIndex * 256) / numLeds + iterationIndex) & 255
                                 );
                 
