@@ -1,6 +1,7 @@
 [
     {
         "id": "bar",
+        "status": true,
         "animation": "rainbow",
         "animationValue": 0,
         "animationValueAlt": 0,
@@ -11,6 +12,7 @@
     },
     {
         "id": "walls",
+        "status": true,
         "animation": "solid",
         "animationValue": 15728655,
         "animationValueAlt": 0,
@@ -21,6 +23,7 @@
     },
     {
         "id": "billard",
+        "status": true,
         "animation": "fade",
         "animationValue": 15728655,
         "animationValueAlt": 900000,
@@ -31,6 +34,7 @@
     },
     {
         "id": "glasses",
+        "status": true,
         "animation": "dance",
         "animationValue": 0,
         "animationValueAlt": 0,
@@ -41,6 +45,7 @@
     },
     {
         "id": "door",
+        "status": true,
         "animation": "twinkle",
         "animationValue": [],
         "animationValueAlt": 0,

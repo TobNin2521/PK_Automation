@@ -24,11 +24,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 let strip = null;
 let relays = null;
-
-if(__deployment) {
-    strip = require("./strip.js");
-    relays = require("./relays.js");
-}
+    
 let stripData = JSON.parse(fs.readFileSync("./config/leds.json", "utf8"));
 let relayData = JSON.parse(fs.readFileSync("./config/lights.json", "utf8"));
 
@@ -47,6 +43,38 @@ if(localAddress == "") {
         }
     }
 }
+
+app.post("/leds/status", function(request, response) {
+	response.header("Access-Control-Allow-Origin", "*");
+    let id = request.body.data.id;
+    let status = request.body.data.status;
+    console.log(" > Set LED status");
+    console.log(" >> ID: " + id);
+    console.log(" >> Status: " + status);
+    
+    let tmpData = null;
+    if(typeof(stripData) == "string") {
+        tmpData = JSON.parse(stripData);
+    }
+    else {
+        tmpData = stripData;
+    }
+
+    for(let i = 0; i < tmpData.length; i++) {
+        let config = tmpData[i];
+        if(config.id == id) {
+            config.status = status ? status : true;
+            console.log(" > Update strip status of id " + config.id + " to " + config.status);
+        }
+    }
+
+    stripData = JSON.stringify(tmpData);
+
+    console.log(" > Send updated data to strip handler");
+    stripData = strip.Update(stripData);
+
+    response.status(200).send({result: "success"});
+});
 
 app.post("/leds", function (request, response) {
 	response.header("Access-Control-Allow-Origin", "*");
@@ -104,10 +132,9 @@ app.post("/leds", function (request, response) {
     }
     stripData = JSON.stringify(tmpData);
 
-    if(__deployment) {
-        console.log(" > Send updated data to strip handler");
-        strip.Update(stripData);
-    }
+    console.log(" > Send updated data to strip handler");
+    stripData = strip.Update(stripData);
+
     response.status(200).send({result: "success"});
 });
 
@@ -128,9 +155,7 @@ app.post("/lights", function (request, response) {
     }
     relayData = JSON.stringify(tmpData);
 
-    if(__deployment) {
-        relays.Update(relayData);
-    }
+    relayData = relays.Update(relayData);
 
     response.status(200).send({result: "success"});
 });
@@ -140,9 +165,9 @@ app.post("/brightness", function (request, response) {
     let brightness = request.body.data.brightness;
     console.log(" > Set LED brightness");
     console.log(" >> Brightness: " + brightness);
-    if(__deployment) {
-        strip.SetBrightness(brightness);
-    }
+    
+    strip.SetBrightness(brightness);
+        
     response.status(200).send({result: "success"});	
 });
 
@@ -179,12 +204,10 @@ app.post("/profiles/set", function (request, response) {
     let ledData = JSON.stringify(profileData.leds);
     let ioData = JSON.stringify(profileData.lights);
     
-    if(__deployment) {
-        strip.Update(ledData);
-        relays.Update(ioData);
-        stripData = ledData;
-        relayData = ioData;
-    }
+    strip.Update(ledData);
+    relays.Update(ioData);
+    stripData = ledData;
+    relayData = ioData;
 
     //TODO: Write configuration to files
     
@@ -233,10 +256,12 @@ if(__useSSL){
         console.log(" Web Server listening at the location below, or by host name and port. ");
         console.log(" https://" + localAddress + ":" + HTTPS_PORT);
         console.log("***********************************************************************");
-        if(__deployment) {
-            strip.Start(stripData);
-            relays.Start(relayData);
-        }
+        
+        strip = require("./strip.js")(__deployment);
+        relays = require("./relays.js")(__deployment);
+
+        strip.Start(stripData);
+        relays.Start(relayData);
     });
 }
 else{
@@ -246,9 +271,11 @@ else{
         console.log(" Web Server listening at the location below, or by host name and port. ");
         console.log(" http://" + localAddress + ":" + HTTP_PORT);
         console.log("***********************************************************************");
-        if(__deployment) {
-            strip.Start(stripData);
-            relays.Start(relayData);
-        }
+        
+        strip = require("./strip.js")(__deployment);
+        relays = require("./relays.js")(__deployment);
+
+        strip.Start(stripData);
+        relays.Start(relayData);
     });
 }

@@ -54,5 +54,7 @@ On project setup use the command `npm install` to install all libraries.
 ## Infos
 
 Selfsigning SSL cert: [Click here](https://stackoverflow.com/questions/11744975/enabling-https-on-express-js)
+
 Progressive Web Apps: [Click here](https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps)
+
 Additional effects: [Click here](https://www.tweaking4all.com/hardware/arduino/adruino-led-strip-effects/)

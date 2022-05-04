@@ -4,41 +4,51 @@
  *              
  **************************************************************************/
 
-let gpio = require("rpi-gpio");
-let relayData = [];
+// Maybe this package is a better fit for my use case https://github.com/jperkin/node-rpio //To test
+// This package is much faster and has I2C, SPI and PWM support (could be useful for slave communication)
 
-function relays() {
-    this.Start = function(_relayData) {
-        relayData = _relayData;
+ module.exports = function relays(__deployment) {
+     let module = {};
+    console.log(" > Initialize Relay module with 'deployment'=" + __deployment);
+    module.gpio = {Write: ()=>{}, setup: ()=>{}, DIR_OUT: ""};
+    module.relayData = [];
+    module.Start = function(_relayData) {
+        if(__deployment) {
+            module.gpio = require("rpi-gpio");
+        }
+
+        module.relayData = _relayData;
         //First option
-        for (let config in relayData) {
-            gpio.setup(config.pin, gpio.DIR_OUT);
+        for (let config in module.relayData) {
+            module.gpio.setup(config.pin, module.gpio.DIR_OUT);
         }
     };
-    this.Update = function(_relayData) {
+    module.Update = function(_relayData) {
         if(typeof(_relayData)  == "string"){
-            relayData = JSON.parse(_relayData);
+            module.relayData = JSON.parse(_relayData);
         }
         else{
-            relayData = _relayData;
+            module.relayData = _relayData;
         }
-        for (let config in relayData) {
-            this.Write(config.pin, config.state);
+        for(let n = 0; n < module.relayData.length; n++) {
+            let config = module.relayData[n];
+            module.Write(config.pin, config.state);
         }
+        return module.relayData;
     };
 
-    this.Write = function(pin, value) {
+    module.Write = function(pin, value) {
         //First option
-        gpio.write(pin, value);
+        module.gpio.write(pin, value);
         //Second option
-        gpio.setup(pin, gpio.DIR_OUT, function(err) {
+        module.gpio.setup(pin, module.gpio.DIR_OUT, function(err) {
             if (err) console.log(err);
-            gpio.write(pin, value, function(err) {
+            module.gpio.write(pin, value, function(err) {
                 if (err) console.log(err);
                 else console.log("Set state of pin " + pin + " to " + value);
             });
         });
     };
-}
 
-module.exports = new relays();
+    return module;
+};
