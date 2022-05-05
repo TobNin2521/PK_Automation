@@ -127,6 +127,16 @@ app.post("/leds", function (request, response) {
                     config.animationValueAlt = 0;
                     config.fadeDirection = false;
                     break;
+                case "fire":
+                    config.animationValue = 0;
+                    config.animationValueAlt = 0;
+                    config.fadeDirection = false;
+                    break;
+                case "meteor":
+                    config.animationValue = 0;
+                    config.animationValueAlt = 0;
+                    config.fadeDirection = false;
+                    break;
             }
         }
     }

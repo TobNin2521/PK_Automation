@@ -7,7 +7,7 @@ import "./Leds.css";
   For LED post:
   {
     id: <string>,                     //String describing the location of the strip (i.e. "bar", "walls", ...)
-    animation: <string>,              //Animation name. Currently implemented: rainbow, solid, fade, dance, twinkle
+    animation: <string>,              //Animation name. Currently implemented: rainbow, solid, fade, dance, twinkle, fire, meteor
     animationValue: <int>,            //Only for animiations solid and fade: int representation of color value (for solid this describes the one color displayed, for fade this is one of the colors between the strip fades)
     animationValueAlt: <int>          //Only for animiation fade: int representation of color value (second fade color)
   }
@@ -77,6 +77,8 @@ export default class Leds extends React.Component {
                         <option value="fade">Fade</option>
                         <option value="dance">Dance</option>
                         <option value="twinkle">Twinkle</option>
+                        <option value="fire">Fire</option>
+                        <option value="meteor">Meteor</option>
                     </select>
                     <br/>
                     <input type="color" id="led-color-one-input" onChange={this.handleColorOneChange} />

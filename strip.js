@@ -9,9 +9,9 @@
     let module = {};
     module.NUM_LEDS = 144;
     module.ws281x = {render: () => {}};
-    module.channel = {array:[]};
+    module.channel = {array: Array(module.NUM_LEDS).fill(0)};
     module.stripData = [];
-    module._updateRecieved = false;
+    module.UpdateRecieved = false;
     module.TwinkleColors = [
         0xffffff,
         0xfcfcfc,
@@ -67,8 +67,8 @@
         module.channel.brightness = brightness;
     };
     module.StripTick = function() {
-        if(module._updateRecieved) console.log(module.stripData);
-        module._updateRecieved = false;
+        if(module.UpdateRecieved) console.log(module.stripData);
+        module.UpdateRecieved = false;
         for(let n = 0; n < module.stripData.length; n++) {
             let config = module.stripData[n]; 
             let numLeds = config.ledCount;
@@ -92,6 +92,12 @@
                     case "twinkle":
                         config = module.TwinkleEffect(offset, numLeds, config);
                         break;
+                    case "fire":
+                        config = module.FireEffect(offset, numLeds, config);
+                        break;
+                    case "meteor":
+                        config = module.MeteorEffect(offset, numLeds, config);
+                        break;
                 }
                 module.stripData[n] = config;
             }
@@ -104,7 +110,7 @@
     };
     module.Update = function(data) {
         console.log(" > Update strip config");
-        module._updateRecieved = true;
+        module.UpdateRecieved = true;
         let tmpData = null;
         if(typeof(data) == "string") {
             tmpData = JSON.parse(data);
@@ -248,6 +254,118 @@
         if(config.animationIndex == 4) config.animationIndex = 0;
         return config;
     }; 
+    module.FireEffect = function(offset, numLeds, config) {
+        let cooldown;
+
+        let heat = Array(numLeds).fill(0);
+        let Cooling = 55;
+        let Sparking = 120;
+        let spectum = config.animationValue; //0=red, 1=green, 2=blue
+        
+        for(let i = 0; i < numLeds; i++) {
+            cooldown = module.getRandomInt(0, ((Cooling * 10) / numLeds) + 2);
+        
+            if(cooldown > heat[i]) {
+                heat[i] = 0;
+            } else {
+                heat[i] = heat[i] - cooldown;
+            }
+        }
+        
+        for(let k = numLeds - 1; k >= 2; k--) {
+            heat[k] = (heat[k - 1] + heat[k - 2] + heat[k - 2]) / 3;
+        }
+        
+        if(module.getRandomInt(0, 255) < Sparking) {
+            let y = module.getRandomInt(0, 7);
+            heat[y] = heat[y] + module.getRandomInt(160, 255);
+        }
+
+        for(let i = offset; i < numLeds + offset; i++) {
+            let t192 = Math.round((heat[i] / 255.0) * 191);
+            
+            let heatramp = t192 & 0x3F;
+            heatramp <<= 2;
+
+            let color = 0;
+            if(t192 > 0x80) {
+                if(spectum == 0) {
+                    color = module.Rgb2Int(255, 255, heatramp);
+                }
+                else if(spectum == 1) {
+                    color = module.Rgb2Int(heatramp, 255, 255);
+                }
+                else {
+                    color = module.Rgb2Int(255, heatramp, 255);
+                }
+            } 
+            else if(t192 > 0x40) {
+                if(spectum == 0) {
+                    color = module.Rgb2Int(255, heatramp, 0);
+                }
+                else if(spectum == 1) {
+                    color = module.Rgb2Int(0, 255, heatramp);
+                }
+                else {
+                    color = module.Rgb2Int(heatramp, 0, 255);
+                }
+            } 
+            else {
+                if(spectum == 0) {
+                    color = module.Rgb2Int(heatramp, 0, 0);
+                }
+                else if(spectum == 1) {
+                    color = module.Rgb2Int(0, heatramp, 0);
+                }
+                else {
+                    color = module.Rgb2Int(0, 0, heatramp);
+                }
+            }
+
+            module.channel.array[i] = color;
+        }
+        return config;
+    };
+    module.MeteorEffect = function(offset, numLeds, config) {
+        let red = module.Int2R(config.animationValue);
+        let green = module.Int2G(config.animationValue);
+        let blue = module.Int2B(config.animationValue);
+        let i = config.animationIndex;
+
+        let meteorSize = 10;
+        let meteorTrailDecay = 64;
+        let meteorRandomDecay = true;
+      
+        for(let j = 0; j < numLeds; j++) {
+            if((!meteorRandomDecay) || (module.getRandomInt(0, 10) > 5)) {
+                let oldColor;
+                let r, g, b;
+            
+                oldColor = module.channel.array[offset + j];
+                r = module.Int2R(oldColor);
+                g = module.Int2G(oldColor);
+                b = module.Int2B(oldColor);
+
+                r = (r <= 10) ? 0 : r - (r * meteorTrailDecay / 256);
+                g = (g <= 10) ? 0 : g - (g * meteorTrailDecay / 256);
+                b = (b <= 10) ? 0 : b - (b * meteorTrailDecay / 256);
+            
+                module.channel.array[offset + j] = module.Rgb2Int(r, g, b); 
+            }
+        }
+        
+        for(let j = 0; j < meteorSize; j++) {
+            let n = i - j;
+            if((n < numLeds) && (n >= 0)) {
+                module.channel.array[offset + n] = module.Rgb2Int(red, green, blue);
+            }
+        }   
+
+        config.animationIndex += 1;
+        if(config.animationIndex >= numLeds * 2) config.animationIndex = 0;
+
+        return config;
+    };
     module.Rgb2Int = function (r, g, b) {
         return ((r & 0xff) << 16) | ((g & 0xff) << 8) | (b & 0xff);
     };
