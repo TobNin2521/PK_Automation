@@ -35,7 +35,7 @@
     {
         "id": "glasses",
         "status": true,
-        "animation": "dance",
+        "animation": "fire",
         "animationValue": 0,
         "animationValueAlt": 0,
         "animationIndex": 0,
@@ -53,5 +53,16 @@
         "fadeDirection": false,
         "ledCount": 10,
         "offset": 40
+    },
+    {
+        "id": "floor",
+        "status": true,
+        "animation": "meteor",
+        "animationValue": 16711935,
+        "animationValueAlt": 0,
+        "animationIndex": 0,
+        "fadeDirection": false,
+        "ledCount": 90,
+        "offset": 50
     }
 ]
