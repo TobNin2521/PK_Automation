@@ -82,4 +82,11 @@ describe("Unit tests for strip class", () => {
         expect(strip.Int2Rgb(65535)).toEqual({red:0, green:255, blue:255});
         expect(strip.Int2Rgb(255)).toEqual({red:0, green:0, blue:255});
     });
+    
+    test("Test Parse function", () => {
+        expect(strip.ParseDataIfString({red:0, green:0, blue:0})).toEqual({red:0, green:0, blue:0});
+        expect(strip.ParseDataIfString('{"red":0,"green":0,"blue":0}')).toEqual({red:0, green:0, blue:0});
+        expect(strip.ParseDataIfString({})).toEqual({});
+        expect(strip.ParseDataIfString("{}")).toEqual({});
+    });
 });

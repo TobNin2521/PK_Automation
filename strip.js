@@ -56,7 +56,7 @@
                 brightness: 20
             });
         }
-        module.stripData = data;
+        module.stripData = module.ParseDataIfString(data);
         module.StripTick();
     };
     module.SetBrightness = function(brightness) {
@@ -111,13 +111,7 @@
     module.Update = function(data) {
         console.log(" > Update strip config");
         module.UpdateRecieved = true;
-        let tmpData = null;
-        if(typeof(data) == "string") {
-            tmpData = JSON.parse(data);
-        }
-        else {
-            tmpData = data;
-        }
+        let tmpData = module.ParseDataIfString(data);
         //verify Data
         for(let n = 0; n < tmpData.length; n++) {
             let _config = tmpData[n];
@@ -409,6 +403,10 @@
 	module.getRandomInt = function (min, max) {
 		return Math.floor(Math.random() * (max - min + 1)) + min;
 	};
+    module.ParseDataIfString = function(data) {
+        if(typeof(data) === "string") return JSON.parse(data);
+        return data;
+    };
 
     return module;
 };

@@ -46,8 +46,8 @@ Here a short list of the important ones:
   Strictly spreaking is express a framework, but we'll put it in this section. Thisis used to create the nodejs webserver.
 * [WS281X](https://www.npmjs.com/package/rpi-ws281x-native-fixed):
   Used to control the WS2812B LED-strips connected to the rPI.
-* [GPIO](https://www.npmjs.com/package/rpi-gpio):
-  Used to control the GPIOs of the rPI.
+* [RPIO](https://www.npmjs.com/package/rpio):
+  Used to control the GPIOs of the rPI, also includes support for I2C, SPI, PWM.
 
 On project setup use the command `npm install` to install all libraries.
 
