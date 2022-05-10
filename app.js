@@ -128,12 +128,12 @@ app.post("/leds", function (request, response) {
                     config.fadeDirection = false;
                     break;
                 case "fire":
-                    config.animationValue = 0;
-                    config.animationValueAlt = 0;
+                    config.animationValue = animationValue ? animationValue : 0;
+                    config.animationValueAlt = [];
                     config.fadeDirection = false;
                     break;
                 case "meteor":
-                    config.animationValue = 0;
+                    config.animationValue = animationValue ? animationValue : 0;
                     config.animationValueAlt = 0;
                     config.fadeDirection = false;
                     break;

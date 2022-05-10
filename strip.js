@@ -118,6 +118,9 @@
             if (_config.animation == "twinkle"){
                 if(typeof(_config.animationValue) == "number") _config.animationValue = [];
             }
+            if (_config.animation == "fire"){
+                if(typeof(_config.animationValue) == "number") _config.animationValue = [];
+            }
         }
         module.stripData = tmpData;
         return module.stripData;
@@ -251,7 +254,10 @@
     module.FireEffect = function(offset, numLeds, config) {
         let cooldown;
 
-        let heat = Array(numLeds).fill(0);
+        if(typeof(config.animationValueAlt) === "number" || config.animationValueAlt == []) config.animationValueAlt = Array(numLeds).fill(0);
+
+        let heat = config.animationValueAlt;
+
         let Cooling = 55;
         let Sparking = 120;
         let spectum = config.animationValue; //0=red, 1=green, 2=blue
@@ -276,7 +282,7 @@
         }
 
         for(let i = offset; i < numLeds + offset; i++) {
-            let t192 = Math.round((heat[i] / 255.0) * 191);
+            let t192 = Math.round((heat[i - offset] / 255.0) * 191);
             
             let heatramp = t192 & 0x3F;
             heatramp <<= 2;
@@ -318,6 +324,9 @@
 
             module.channel.array[i] = color;
         }
+
+        config.animationValueAlt = heat;
+
         return config;
     };
     module.MeteorEffect = function(offset, numLeds, config) {
