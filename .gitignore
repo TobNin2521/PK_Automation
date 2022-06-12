@@ -90,3 +90,5 @@ typings/
 public/dev/.vscode/
 
 public/dist/build/
+
+.vscode/
