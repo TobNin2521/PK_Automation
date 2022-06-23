@@ -192,6 +192,19 @@ app.get("/config/leds", function (req, res) {
     res.send(JSON.stringify(stripData));
 });
 
+app.get("/leds/config_by_id", function(req, res) {    
+	res.header("Access-Control-Allow-Origin", "*");
+    let id = req.query.led;
+    let retval = {};
+    let parsedData = typeof(stripData) === "string" ? JSON.parse(stripData) : stripData;
+    for(let i = 0; i < parsedData.length; i++) {
+        if(parsedData[i].id == id) {
+            retval = parsedData[i];
+        }
+    }
+    res.send(JSON.stringify(retval));
+});
+
 app.get("/config/lights", function (req, res) {
 	res.header("Access-Control-Allow-Origin", "*");
     relayData = JSON.parse(fs.readFileSync("./config/lights.json", "utf8"));
