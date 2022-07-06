@@ -6,11 +6,11 @@
 #define NUM_LEDS 144
 
 enum LedEffect {
-    None = 0x00,
-    RainbowCycle = 0x01,
-    Fire = 0x02,
-    MeteorRain = 0x03,
-    TheaterChase = 0x04
+    NoneE = 0x00,
+    RainbowCycleE = 0x01,
+    FireE = 0x02,
+    MeteorRainE = 0x03,
+    TheaterChaseE = 0x04
 };
 
 struct LedObject {
@@ -18,7 +18,7 @@ struct LedObject {
     bool status;
     int color1;
     int color2;
-}
+};
 
 CRGB leds[NUM_LEDS];
 
@@ -28,15 +28,15 @@ LedObject LedConfig;
 ------------------- General Functions ---------------------
 */
 
-void LedInit() {
-    FastLED.addLeds<WS2812, PIN, GRB>(leds, NUM_LEDS).setCorrection(TypicalLEDStrip);
-    setBrightness(5);
-}
-
 void setBrightness(uint8_t b) {
     if (b < 0) b = 0;
     if (b > 255) b = 255;
     FastLED.setBrightness(b);
+}
+
+void LedInit() {
+    FastLED.addLeds<WS2812, LED_PIN, GRB>(leds, NUM_LEDS).setCorrection(TypicalLEDStrip);
+    setBrightness(5);
 }
 
 void showStrip()
@@ -64,7 +64,7 @@ void setAll(byte red, byte green, byte blue)
 ------------------- Effect Functions ---------------------
 */
 
-#pragma region Fire
+#pragma region FireFunctions
 
 void setPixelHeatColor(int Pixel, byte temperature)
 {
@@ -136,7 +136,7 @@ void Fire(int Cooling, int Sparking, int SpeedDelay)
 
 #pragma endregion
 
-#pragma region MeteorRain
+#pragma region MeteorRainFunction
 
 void fadeToBlack(int ledNo, byte fadeValue)
 {
@@ -175,7 +175,7 @@ void meteorRain(byte red, byte green, byte blue, byte meteorSize, byte meteorTra
 
 #pragma endregion
 
-#pragma region TheaterChase
+#pragma region TheaterChaseFunction
 
 byte* Wheel(byte WheelPos)
 {
@@ -232,7 +232,7 @@ void theaterChaseRainbow(int SpeedDelay)
 
 #pragma endregion
 
-#pragma region RainbowCycle
+#pragma region RainbowCycleFunction
 
 void rainbowCycle(int SpeedDelay)
 {
