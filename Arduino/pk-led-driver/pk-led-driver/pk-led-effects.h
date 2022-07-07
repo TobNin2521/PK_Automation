@@ -10,7 +10,9 @@ enum LedEffect {
     RainbowCycleE = 0x01,
     FireE = 0x02,
     MeteorRainE = 0x03,
-    TheaterChaseE = 0x04
+    TheaterChaseE = 0x04,
+    SolidE = 0x05,
+    FadeE = 0x06
 };
 
 struct LedObject {
@@ -58,6 +60,16 @@ void setAll(byte red, byte green, byte blue)
         setPixel(i, red, green, blue);
     }
     showStrip();
+}
+
+int* getRgbFromInt(int color) {
+    int retVal[3];
+
+    retVal[0] = (color & 0xFF0000) >> 16;
+    retVal[1] = (color & 0x00FF00) >> 8;
+    retVal[2] = (color & 0x0000FF);
+
+    return retVal;
 }
 
 /*
@@ -143,34 +155,37 @@ void fadeToBlack(int ledNo, byte fadeValue)
     leds[ledNo].fadeToBlackBy(fadeValue);
 }
 
-void meteorRain(byte red, byte green, byte blue, byte meteorSize, byte meteorTrailDecay, boolean meteorRandomDecay, int SpeedDelay)
+int meteorIndex = 0;
+
+void meteorRain(byte meteorSize, byte meteorTrailDecay, boolean meteorRandomDecay, int SpeedDelay)
 {
-    setAll(0, 0, 0);
-
-    for (int i = 0; i < NUM_LEDS + NUM_LEDS; i++)
-    {
-
-        // fade brightness all LEDs one step
-        for (int j = 0; j < NUM_LEDS; j++)
-        {
-            if ((!meteorRandomDecay) || (random(10) > 5))
-            {
-                fadeToBlack(j, meteorTrailDecay);
-            }
-        }
-
-        // draw meteor
-        for (int j = 0; j < meteorSize; j++)
-        {
-            if ((i - j < NUM_LEDS) && (i - j >= 0))
-            {
-                setPixel(i - j, red, green, blue);
-            }
-        }
-
-        showStrip();
-        delay(SpeedDelay);
+    if(meteorIndex == 0) {
+        setAll(0, 0, 0);
     }
+    int* rgb = getRgbFromInt(LedConfig.color1);
+
+    // fade brightness all LEDs one step
+    for (int j = 0; j < NUM_LEDS; j++)
+    {
+        if ((!meteorRandomDecay) || (random(10) > 5))
+        {
+            fadeToBlack(j, meteorTrailDecay);
+        }
+    }
+
+    // draw meteor
+    for (int j = 0; j < meteorSize; j++)
+    {
+        if ((i - j < NUM_LEDS) && (i - j >= 0))
+        {
+            setPixel(i - j, rgb[0], rgb[1], rgb[2]);
+        }
+    }
+
+    showStrip();
+    delay(SpeedDelay);
+
+    meteorIndex = (meteorIndex + 1) % (NUM_LEDS + NUM_LEDS);
 }
 
 #pragma endregion
@@ -205,28 +220,30 @@ byte* Wheel(byte WheelPos)
     return c;
 }
 
+int theaterIndex = 0;
+int theaterColorIndex = 0;
+
 void theaterChaseRainbow(int SpeedDelay)
 {
     byte* c;
 
-    for (int j = 0; j < 256; j++)
-    { // cycle all 256 colors in the wheel
-        for (int q = 0; q < 3; q++)
-        {
-            for (int i = 0; i < NUM_LEDS; i = i + 3)
-            {
-                c = Wheel((i + j) % 255);
-                setPixel(i + q, *c, *(c + 1), *(c + 2)); // turn every third pixel on
-            }
-            showStrip();
+    for (int i = 0; i < NUM_LEDS; i = i + 3)
+    {
+        c = Wheel((i + theaterIndex) % 255);
+        setPixel(i + theaterColorIndex, *c, *(c + 1), *(c + 2)); // turn every third pixel on
+    }
+    showStrip();
 
-            delay(SpeedDelay);
+    delay(SpeedDelay);
 
-            for (int i = 0; i < NUM_LEDS; i = i + 3)
-            {
-                setPixel(i + q, 0, 0, 0); // turn every third pixel off
-            }
-        }
+    for (int i = 0; i < NUM_LEDS; i = i + 3)
+    {
+        setPixel(i + theaterColorIndex, 0, 0, 0); // turn every third pixel off
+    }
+
+    theaterColorIndex = (theaterColorIndex + 1) % 3;
+    if(theaterColorIndex == 2) {                
+        theaterIndex = (theaterIndex + 1) % 256;
     }
 }
 
@@ -234,21 +251,58 @@ void theaterChaseRainbow(int SpeedDelay)
 
 #pragma region RainbowCycleFunction
 
+int rainbowIndex = 0;
+
 void rainbowCycle(int SpeedDelay)
 {
     byte* c;
-    uint16_t i, j;
+    uint16_t i;
 
-    for (j = 0; j < 256 * 5; j++)
-    { // 5 cycles of all colors on wheel
-        for (i = 0; i < NUM_LEDS; i++)
-        {
-            c = Wheel(((i * 256 / NUM_LEDS) + j) & 255);
-            setPixel(i, *c, *(c + 1), *(c + 2));
-        }
-        showStrip();
-        delay(SpeedDelay);
+    for (i = 0; i < NUM_LEDS; i++)
+    {
+        c = Wheel(((i * 256 / NUM_LEDS) + rainbowIndex) & 255);
+        setPixel(i, *c, *(c + 1), *(c + 2));
     }
+    showStrip();
+    delay(SpeedDelay);
+
+    rainbowIndex = (rainbowIndex + 1) % (256 * 5);
+}
+
+#pragma endregion
+
+#pragma region SolidFunctions
+
+void solid(){
+    int* rgb = getRgbFromInt(LedConfig.color1);
+    setAll(rgb[0], rgb[1], rgb[2]);
+}
+
+#pragma endregion
+
+#pragma redion FadeFunctions
+
+bool fadeDirection = true;
+int fadeIndex = 0;
+
+void fade() {    
+    int fadeColor1 = LedConfig.color1;
+    int fadeColor2 = LedConfig.color2;
+    if(!fadeDirection) {
+        fadeColor1 = LedConfig.color2;
+        fadeColor2 = LedConfig.color1;
+    }
+    int* rgb1 = getRgbFromInt(fadeColor1);
+    int* rgb2 = getRgbFromInt(fadeColor2);
+    
+    int r = ((rgb1[0] * (255 - fadeIndex)) + (rgb2[0] * fadeIndex)) / 255;
+    int g = ((rgb1[1] * (255 - fadeIndex)) + (rgb2[1] * fadeIndex)) / 255;
+    int b = ((rgb1[2] * (255 - fadeIndex)) + (rgb2[2] * fadeIndex)) / 255;
+
+    if(fadeIndex == 255) fadeDirection = !fadeDirection;
+    fadeIndex = (fadeIndex + 1) % 256;
+
+    setAll(r, g, b);
 }
 
 #pragma endregion

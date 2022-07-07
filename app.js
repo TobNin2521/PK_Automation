@@ -29,6 +29,15 @@ let relays = null;
 let stripData = JSON.parse(fs.readFileSync("./config/leds.json", "utf8"));
 let relayData = JSON.parse(fs.readFileSync("./config/lights.json", "utf8"));
 
+const ledIdDict = {
+    "0": "bar",
+    "1": "walls",
+    "2": "billard",
+    "3": "glasses",
+    "4": "floor",
+    "5": "door"
+};
+
 let HTTP_PORT = 8080;
 let HTTPS_PORT = 8443;
 let localAddress = "";
@@ -215,7 +224,7 @@ app.get("/leds/config_by_id", function(req, res) {
     let retval = {};
     let parsedData = typeof(stripData) === "string" ? JSON.parse(stripData) : stripData;
     for(let i = 0; i < parsedData.length; i++) {
-        if(parsedData[i].id == id) {
+        if(parsedData[i].id == id || parsedData[i].id  == ledIdDict[id]) {
             retval = parsedData[i];
         }
     }

@@ -12,7 +12,7 @@ const char* password = "87783538650372096735";
 String response = "";
 const String IP_ADDRESS = "http://192.168.178.101:8080";
 const String API_PATH = "/leds/config_by_id?led=";
-const String LED_ID = "walls";
+const String LED_ID;
 //JSON document
 DynamicJsonDocument doc(2048);
 
@@ -29,13 +29,19 @@ void SlaveInit() {
     }
     Serial.print("WiFi connected with IP: ");
     Serial.println(WiFi.localIP());
+    LED_ID = getSlaveId();
+}
+
+String getSlaveId() {
+  //Implement slave ID from Dip-switch
+  return "1";
 }
 
 LedEffect getLedEffectFromString(String effect) {
   if(effect == "rainbow"){
       return LedEffect::RainbowCycleE;
   }
-  if(effect == "rainbow"){
+  if(effect == "fire"){
         return LedEffect::FireE;
   }
   if(effect == "theater"){
@@ -43,6 +49,12 @@ LedEffect getLedEffectFromString(String effect) {
   }
   if(effect == "meteor"){
         return LedEffect::MeteorRainE;
+  }
+  if(effect == "solid"){
+        return LedEffect::SolidE;
+  }
+  if(effect == "fade"){
+        return LedEffect::FadeE;
   }
   return LedEffect::NoneE;
 }
@@ -58,18 +70,16 @@ void getEffectFromMaster() {
   if (error) {
       Serial.print(F("deserializeJson() failed: "));
       Serial.println(error.f_str());
+      LedConfig.status = false;
+      LedConfig.effect = LedEffect::NoneE;
+      LedConfig.color1 = 0xff0000;
+      LedConfig.color2 = 0x00ff00;
       return;
   }
   LedConfig.effect = getLedEffectFromString(doc["animation"].as<String>());
   LedConfig.status = doc["status"].as<bool>();
   LedConfig.color1 = doc["animationValue"].as<int>();
   LedConfig.color2 = doc["animationValueAlt"].as<int>();
-  
-  Serial.println("LedEffect:");
-  Serial.println(LedConfig.effect);
-  Serial.println(LedConfig.status);
-  Serial.println(LedConfig.color1);
-  Serial.println(LedConfig.color2);
   
   http.end();
   Serial.println(millis() - mill);
