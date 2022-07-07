@@ -5,6 +5,7 @@
  **************************************************************************/
 
 let __deployment = false;
+let __master_slave = true;
 let __useSSL = false;
 
 let express = require("express");
@@ -70,8 +71,10 @@ app.post("/leds/status", function(request, response) {
 
     stripData = JSON.stringify(tmpData);
 
-    console.log(" > Send updated data to strip handler");
-    stripData = strip.Update(stripData);
+    if(!__master_slave) {
+        console.log(" > Send updated data to strip handler");
+        stripData = strip.Update(stripData);
+    }
 
     response.status(200).send({result: "success"});
 });
@@ -142,8 +145,10 @@ app.post("/leds", function (request, response) {
     }
     stripData = JSON.stringify(tmpData);
 
-    console.log(" > Send updated data to strip handler");
-    stripData = strip.Update(stripData);
+    if(!__master_slave){
+        console.log(" > Send updated data to strip handler");
+        stripData = strip.Update(stripData);
+    }
 
     response.status(200).send({result: "success"});
 });
@@ -176,7 +181,19 @@ app.post("/brightness", function (request, response) {
     console.log(" > Set LED brightness");
     console.log(" >> Brightness: " + brightness);
     
-    strip.SetBrightness(brightness);
+    if(!__master_slave) {
+        strip.SetBrightness(brightness);
+    }
+    else{
+        let slaveID = request.body.data.slaveId;
+        let tmpData = JSON.parse(stripData);
+        for(let config in tmpData) {
+            if(config.id == slaveID) {
+                config.brightness = brightness;
+            }
+        }
+        stripData = JSON.stringify(tmpData);
+    }
         
     response.status(200).send({result: "success"});	
 });
@@ -227,7 +244,9 @@ app.post("/profiles/set", function (request, response) {
     let ledData = JSON.stringify(profileData.leds);
     let ioData = JSON.stringify(profileData.lights);
     
-    strip.Update(ledData);
+    if(!__master_slave){
+        strip.Update(ledData);
+    }
     relays.Update(ioData);
     stripData = ledData;
     relayData = ioData;
@@ -279,11 +298,11 @@ if(__useSSL){
         console.log(" Web Server listening at the location below, or by host name and port. ");
         console.log(" https://" + localAddress + ":" + HTTPS_PORT);
         console.log("***********************************************************************");
-        
-        strip = require("./strip.js")(__deployment);
+        if(!__master_slave){
+            strip = require("./strip.js")(__deployment);
+            strip.Start(stripData);
+        }
         relays = require("./relays.js")(__deployment);
-
-        strip.Start(stripData);
         relays.Start(relayData);
     });
 }
@@ -295,10 +314,11 @@ else{
         console.log(" http://" + localAddress + ":" + HTTP_PORT);
         console.log("***********************************************************************");
         
-        strip = require("./strip.js")(__deployment);
+        if(!__master_slave) {
+            strip = require("./strip.js")(__deployment);
+            strip.Start(stripData);
+        }
         relays = require("./relays.js")(__deployment);
-
-        strip.Start(stripData);
         relays.Start(relayData);
     });
 }
