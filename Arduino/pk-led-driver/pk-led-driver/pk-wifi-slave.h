@@ -6,13 +6,13 @@
 #include <ArduinoJson.h>
 
 //Provide your own WiFi credentials
-const char* ssid = "<Your WiFi SSID>";
-const char* password = "<Your WiFi Password>";
+const char* ssid = "EOLO - FRITZ!Box 7530 DJ";
+const char* password = "87783538650372096735";
 //String for storing server response
 String response = "";
-const String IP_ADDRESS = "";
+const String IP_ADDRESS = "http://192.168.178.101:8080";
 const String API_PATH = "/leds/config_by_id?led=";
-const String LED_ID = "";
+const String LED_ID = "walls";
 //JSON document
 DynamicJsonDocument doc(2048);
 
@@ -31,25 +31,48 @@ void SlaveInit() {
     Serial.println(WiFi.localIP());
 }
 
-void getEffectFromMaster() {
-    HTTPClient http;
-    String request = IP_ADDRESS + API_PATH + LED_ID;
-    http.begin(request);
-    http.GET();
-    response = http.getString();
-    DeserializationError error = deserializeJson(doc, response);
-    if (error) {
-        Serial.print(F("deserializeJson() failed: "));
-        Serial.println(error.f_str());
-        return;
-    }
-    LedConfig.effect = doc["animation"].as<int>();
-    LedConfig.status = doc["status"].as<bool>();
-    LedConfig.color1 = doc["animationValue"].as<int>();
-    LedConfig.color1 = doc["animationValueAlt"].as<int>();
+LedEffect getLedEffectFromString(String effect) {
+  if(effect == "rainbow"){
+      return LedEffect::RainbowCycleE;
+  }
+  if(effect == "rainbow"){
+        return LedEffect::FireE;
+  }
+  if(effect == "theater"){
+        return LedEffect::TheaterChaseE;
+  }
+  if(effect == "meteor"){
+        return LedEffect::MeteorRainE;
+  }
+  return LedEffect::NoneE;
+}
 
-    http.end();
-    delay(2000);
+void getEffectFromMaster() {
+  int mill = millis();
+  HTTPClient http;
+  String request = IP_ADDRESS + API_PATH + LED_ID;
+  http.begin(request);
+  http.GET();
+  response = http.getString();
+  DeserializationError error = deserializeJson(doc, response);
+  if (error) {
+      Serial.print(F("deserializeJson() failed: "));
+      Serial.println(error.f_str());
+      return;
+  }
+  LedConfig.effect = getLedEffectFromString(doc["animation"].as<String>());
+  LedConfig.status = doc["status"].as<bool>();
+  LedConfig.color1 = doc["animationValue"].as<int>();
+  LedConfig.color2 = doc["animationValueAlt"].as<int>();
+  
+  Serial.println("LedEffect:");
+  Serial.println(LedConfig.effect);
+  Serial.println(LedConfig.status);
+  Serial.println(LedConfig.color1);
+  Serial.println(LedConfig.color2);
+  
+  http.end();
+  Serial.println(millis() - mill);
 }
 
 #endif
