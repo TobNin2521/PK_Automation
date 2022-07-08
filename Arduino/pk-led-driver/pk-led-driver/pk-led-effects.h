@@ -176,9 +176,9 @@ void meteorRain(byte meteorSize, byte meteorTrailDecay, boolean meteorRandomDeca
     // draw meteor
     for (int j = 0; j < meteorSize; j++)
     {
-        if ((i - j < NUM_LEDS) && (i - j >= 0))
+        if ((meteorIndex - j < NUM_LEDS) && (meteorIndex - j >= 0))
         {
-            setPixel(i - j, rgb[0], rgb[1], rgb[2]);
+            setPixel(meteorIndex - j, rgb[0], rgb[1], rgb[2]);
         }
     }
 

@@ -12,9 +12,14 @@ const char* password = "87783538650372096735";
 String response = "";
 const String IP_ADDRESS = "http://192.168.178.101:8080";
 const String API_PATH = "/leds/config_by_id?led=";
-const String LED_ID;
+String LED_ID;
 //JSON document
 DynamicJsonDocument doc(2048);
+
+String getSlaveId() {
+  //Implement slave ID from Dip-switch
+  return "1";
+}
 
 void SlaveInit() {
     //Initiate WiFi connection
@@ -30,11 +35,6 @@ void SlaveInit() {
     Serial.print("WiFi connected with IP: ");
     Serial.println(WiFi.localIP());
     LED_ID = getSlaveId();
-}
-
-String getSlaveId() {
-  //Implement slave ID from Dip-switch
-  return "1";
 }
 
 LedEffect getLedEffectFromString(String effect) {
