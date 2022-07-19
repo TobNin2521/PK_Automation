@@ -1,5 +1,4 @@
 import React from "react";
-import "./Content.css";
 import "./Profiles.css";
 
 export default class Profiles extends React.Component {

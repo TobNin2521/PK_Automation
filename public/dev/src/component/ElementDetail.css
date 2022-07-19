@@ -1,0 +1,7 @@
+.element-detail {    
+    position: relative;
+    width: calc(100% - 6vh);
+    height: calc(100% - 6vh);
+    z-index: 95;
+    padding: 2vw;
+}

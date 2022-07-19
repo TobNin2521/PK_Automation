@@ -1,5 +1,4 @@
 import React from "react";
-import "./Content.css";
 import "./Lights.css";
 
 /* API config 

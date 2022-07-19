@@ -10,13 +10,13 @@ export default class Menu extends React.Component {
         return (
             <div className="menu-container">
                 <div className="menu-item" onClick={ () => this.props.callback("lights") }>
-                    Lights
+                    X
                 </div>
                 <div className="menu-item" onClick={ () => this.props.callback("leds") }>
-                    Leds
+                    X
                 </div>
                 <div className="menu-item" onClick={ () => this.props.callback("profiles") }>
-                    Profiles
+                    X
                 </div>
             </div>
         );

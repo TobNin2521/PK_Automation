@@ -1,0 +1,19 @@
+.settings-container {
+    width: 95vw;
+    height: 100vh;
+    position: absolute;
+    top: 0;
+    left: -95vw;
+    z-index: 99;
+    background-color: #9ce49a;
+}
+
+.settings-hidden {
+    left: -95vw;
+    transition: left 400ms;
+}
+
+.settings-shown {
+    left: 5vw;
+    transition: left 400ms;
+}

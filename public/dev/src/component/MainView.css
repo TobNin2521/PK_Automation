@@ -1,0 +1,17 @@
+.main-view-container {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    background-color: #979797;
+}
+.main-view-hidden {
+    top: -100vh;
+    transition: top 800ms;
+}
+
+.main-view-shown {
+    top: 0;
+    transition: top 800ms;
+}

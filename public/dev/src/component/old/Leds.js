@@ -1,5 +1,5 @@
 import React from "react";
-import "./Content.css";
+import ColorPicker from "./ColorPicker";
 import "./Leds.css";
 
 /* API config 
@@ -64,6 +64,7 @@ export default class Leds extends React.Component {
     render() {
         return (
             <div className="leds-containter">
+                <ColorPicker size="50px" color={[0, 0, 255]} callback={(color)=> console.log(color)} colorAsInt={true}/>
                 <div className="brigthness-container">
                     <span>Brightness slider 0-255</span>
                     <input id="led-brightness" type="range" min="0" max="255" value={this.state.brightness} onChange={this.handleBrightnessChange} step="1"/>

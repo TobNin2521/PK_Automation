@@ -1,0 +1,23 @@
+.detail-view-container {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 100vh;
+    left: 0;
+    background-color: #eb9c9c;
+}
+.detail-view-hidden {
+    top: 100vh;
+    transition: top 800ms;
+}
+
+.detail-view-shown {
+    top: 0;
+    transition: top 800ms;
+}
+.detail-view-back {
+    width: 100%;
+    height: 7.5%;
+    filter: opacity(.7);
+    background-color: #533030;
+}

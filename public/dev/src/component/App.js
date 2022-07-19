@@ -1,16 +1,22 @@
-import React, { Profiler } from "react";
-import Leds from "./Leds";
-import Lights from "./Lights";
-import Profiles from "./Profiles";
+import React, { createRef, Profiler } from "react";
 import Menu from "./Menu";
 import "./App.css";
+import Content from "./Content";
+import Settings from "./Settings";
 
 export default class App extends React.Component {
-  state = {
-    selectedMenu: "lights"
-  };
+  constructor(props) {
+    super(props);
+    this.state = {
+      selectedMenu: "lights"
+    };
+    this.contentRef = createRef();
+    this.settingsRef = createRef();
+  }
 
   onMenuItemSelected = (menuName) => {
+    //this.contentRef.current.detailViewShow();
+    this.settingsRef.current.showSettings();
     this.setState({
       selectedMenu: menuName
     });
@@ -38,10 +44,9 @@ export default class App extends React.Component {
   render() {
     return (
       <div className="app-containter">
+        <Settings ref={this.settingsRef} />
         <Menu callback={this.onMenuItemSelected} />
-        { this.state.selectedMenu == "lights" ? <Lights post={this.apiPost} /> : null }
-        { this.state.selectedMenu == "leds" ? <Leds post={this.apiPost} /> : null }
-        { this.state.selectedMenu == "profiles" ? <Profiles post={this.apiPost} get={this.apiGet} /> : null }
+        <Content get={this.apiGet} post={this.apiPost} ref={this.contentRef} />
       </div>
     );
   }

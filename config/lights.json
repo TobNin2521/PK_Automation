@@ -2,11 +2,11 @@
     {
         "id": "bar",
         "pin": 5,
-        "state": true
+        "status": true
     },
     {
         "id": "billard",
         "pin": 15,
-        "state": false
+        "status": false
     }
 ]
