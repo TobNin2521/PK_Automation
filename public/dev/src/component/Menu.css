@@ -1,12 +1,13 @@
 .menu-container {
     height: 100vh;
-    width: 5vw;
+    width: calc(5vw - 1px);
     position: absolute;
     left: 0;
     top: 0;
     line-height: 5vw;
     z-index: 999;
-    background-color: #cecece;
+    background-color: #181818;
+    border-right: 1px solid #00ff1a;
 }
 .menu-item {
     height: 5vw;
@@ -16,5 +17,5 @@
     cursor: pointer;
 }
 .menu-item:hover {
-    background-color: #a3a3a3;
+    background-color: #353535;
 }

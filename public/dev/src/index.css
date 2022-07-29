@@ -1,6 +1,7 @@
 * {
     margin: 0;
     padding: 0;
+    user-select: none;
 }
 @font-face {
     font-family: Russo;
@@ -9,4 +10,6 @@
 body {
     overflow: hidden;
     font-family: Russo;
+    color: #00ff1a;
+    background-color: #181818;
 }

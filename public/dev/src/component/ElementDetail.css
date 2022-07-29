@@ -5,3 +5,20 @@
     z-index: 95;
     padding: 2vw;
 }
+.element-save {
+    position: absolute;
+    bottom: 5vh;
+    left: 5vh;
+    border: 1px solid #00ff1c;
+    padding: 1vh 3vh;
+    border-radius: 0.5vh;
+    font-size: 3vh;    
+    background-color: rgb(76, 76, 76);
+    filter: drop-shadow(2px 4px 6px black);
+}
+.element-save:hover {
+    background-color: rgb(50, 50, 50);
+}
+.element-save:active {
+    background-color: rgb(50, 50, 50);
+}

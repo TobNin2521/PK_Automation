@@ -21,6 +21,8 @@ export default class LedStrip extends React.Component {
     }
   
     animation = "rainbow"
+    spectrum = [255, 0, 0]
+    reset = false
 
     setPixel = (i, color) => {
         let pixel = {};
@@ -30,6 +32,14 @@ export default class LedStrip extends React.Component {
 
     setAnimation = (effect) => {
         this.animation = effect;
+    }
+
+    setSpectrum = (spectrum) => {
+        this.spectrum = spectrum;
+        for (let i=0; i < this.props.count; i++) {
+          this.setPixel(i, [0, 0, 0]); 
+        }
+        this.reset = true;
     }
 
     runStrip = () => {
@@ -49,7 +59,7 @@ export default class LedStrip extends React.Component {
             this.meteorRain(10, 64, true);
         }
         if(this.animation == "fire") {
-            this.fire(55, 120);
+            this.fire(55, 40);
         }
     }
 
@@ -196,11 +206,12 @@ export default class LedStrip extends React.Component {
             this.runStrip();
             return;
         }
-        if(!heat){
+        if(!heat || this.reset == true){
             heat = [];
             for(let i = 0; i < this.props.count; i++){
                 heat.push(0);
             }
+            this.reset = false;
         }
         let cooldown;
     
@@ -236,18 +247,45 @@ export default class LedStrip extends React.Component {
             let heatramp = t192 & 0x3F;
             heatramp <<= 2;
         
+            let color = [];
+
             if (t192 > 0x80)
             {
-                this.setPixel(j, [255, 255, heatramp]);
+                if(this.spectrum[0] == 255){
+                    color = [255, 255, heatramp];
+                }
+                if(this.spectrum[1] == 255){
+                    color = [heatramp, 255, 255];
+                }
+                if(this.spectrum[2] == 255){
+                    color = [255, heatramp, 255];
+                }
             }
             else if (t192 > 0x40)
             { 
-                this.setPixel(j, [255, heatramp, 0]);
+                if(this.spectrum[0] == 255){
+                    color = [255, heatramp, 0];
+                }
+                if(this.spectrum[1] == 255){
+                    color = [0, 255, heatramp];
+                }
+                if(this.spectrum[2] == 255){
+                    color = [heatramp, 0, 255];
+                }
             }
             else
             { 
-                this.setPixel(j, [heatramp, 0, 0]);
+                if(this.spectrum[0] == 255){
+                    color = [heatramp, 0, 0];
+                }
+                if(this.spectrum[1] == 255){
+                    color = [0, heatramp, 0];
+                }
+                if(this.spectrum[2] == 255){
+                    color = [0, 0, heatramp];
+                }
             }
+            this.setPixel(j, color);
         }
     
         setTimeout(() => {

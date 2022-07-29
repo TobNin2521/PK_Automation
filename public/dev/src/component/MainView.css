@@ -4,7 +4,10 @@
     height: 100%;
     top: 0;
     left: 0;
-    background-color: #979797;
+    background-color: #181818;
+    background-image: url("../images/main.png");
+    background-size:  cover;
+    background-repeat: no-repeat;
 }
 .main-view-hidden {
     top: -100vh;

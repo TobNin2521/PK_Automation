@@ -1,4 +1,5 @@
 .view-field-container {
     position: absolute;
-    background-color: rgb(154, 201, 242);
+    border: 1px solid #00ff1a;
+    border-radius: 10px;
 }

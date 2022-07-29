@@ -34,8 +34,13 @@ export default class DetailView extends React.Component {
                 elements.push(<Element item={item} key={item.apiKey} get={this.props.get} post={this.props.post} />);
             }
         }
+        let styles = {
+            view: {
+                backgroundImage: this.state.field != "" ? "url('../images/" + this.state.field + ".png')" : ""
+            }
+        };
         return (
-            <div className={detailViewClasses}  /*onClick={this.props.hideDetailView}*/>
+            <div className={detailViewClasses} style={styles.view} /*onClick={this.props.hideDetailView}*/>
                 <div className="detail-view-back" onClick={this.props.hideDetailView}>
 
                 </div>

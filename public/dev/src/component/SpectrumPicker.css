@@ -1,0 +1,23 @@
+.spectrum-picker-container {
+
+}
+.spectrum {
+    display: inline-block;
+    height: 3vh;
+    width: 5vw;
+    margin-right: 0.5vw;
+    border: 0.4vh solid #fff;
+    border-radius: .6vh;
+}
+.spectrum-red {
+    background-color: #ff0000;
+}
+.spectrum-green {
+    background-color: #00ff00;
+}
+.spectrum-blue {
+    background-color: #0000ff;    
+}
+.spectrum.selected {
+    border: 0.4vh solid rgb(169, 169, 169);
+}

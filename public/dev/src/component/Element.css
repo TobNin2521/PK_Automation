@@ -1,6 +1,7 @@
 .element-container {
     position: absolute;
-    background-color: rgb(252, 125, 222);
+    border: 1px solid #00ff1a;
+    border-radius: 10px;
 }
 .element-details-container {
     position: absolute;
@@ -31,5 +32,5 @@
     transition: filter 200ms;
     z-index: 5;
     filter: opacity(0.7);
-    background-color: rgb(40, 40, 40);
+    background-color: rgb(0, 0, 0);
 }

@@ -9,23 +9,27 @@ const Config = {
         },
         "items": [
             {
-                "name": "Bottles",                
+                "name": "Bottles",
                 "bbox": {
                     x: 55,
                     y: 35,
                     w: 10,
-                    h: 10
+                    h: 10,
+                    r: 0,
+                    nr: 0
                 },
                 "apiKey": "bottles",
                 "type": "LED"
             },
             {
-                "name": "Bar",                
+                "name": "Bar",
                 "bbox": {
                     x: 50,
                     y: 75,
                     w: 10,
-                    h: 10
+                    h: 10,
+                    r: 0,
+                    nr: 0
                 },
                 "apiKey": "bar",
                 "type": "LED"

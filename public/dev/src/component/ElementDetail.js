@@ -2,6 +2,7 @@ import React, { createRef } from "react";
 import "./ElementDetail.css";
 import LedStrip from "./LedStrip";
 import ColorPicker from "./ColorPicker"
+import SpectrumPicker from "./SpectrumPicker";
 
 export default class ElementDetail extends React.Component {
     constructor(props) {
@@ -9,6 +10,7 @@ export default class ElementDetail extends React.Component {
         this.state = {
             selectedStatus: true,
             selectedAnimation: "rainbow",
+            selectedSpectrum: [0, 255, 0],
             selectedColor: [255, 0, 0],
             selectedColorAlt: [0, 0, 255],
             selectedBrightness: 100
@@ -66,6 +68,13 @@ export default class ElementDetail extends React.Component {
         });
     }
 
+    onSpectrumChange = (spectrum) => {
+        this.setState({
+            selectedSpectrum: spectrum
+        });
+        this.stripRef.current.setSpectrum(spectrum);
+    }
+
     onSaveElement = () => {
         let apiPath = this.props.item.type == "LED" ? "/leds" : "/lights";
         let data = {
@@ -106,16 +115,27 @@ export default class ElementDetail extends React.Component {
                                     <option value="fire">Fire</option>
                                 </select>
                             </div>
+                            { this.state.selectedAnimation == "fire" ? 
+                            <div>Spectrum: <SpectrumPicker spectrum={this.state.selectedSpectrum} onSpectrumChange={this.onSpectrumChange} /></div>
+                            : null }
+                            { this.state.selectedAnimation != "rainbow" && this.state.selectedAnimation != "theater"  && this.state.selectedAnimation != "fire" ? 
                             <div>Color #1: <ColorPicker size="25px" color={this.state.selectedColor} callback={this.onColorSelect} colorAsInt={false} /></div>
+                            : null }
+                            { this.state.selectedAnimation == "fade" ? 
                             <div>Color #2: <ColorPicker size="25px" color={this.state.selectedColorAlt} callback={this.onColorAltSelect} colorAsInt={false} /></div>
+                            : null }
                             <div>Brightness: <input type="range" value={this.state.selectedBrightness} onChange={this.onBrightnessChange} step="5" min="0" max="255"/></div>
 
-                            <LedStrip ref={this.stripRef} count={40} radius={15} animation={this.state.selectedAnimation} color={this.state.selectedColor} colorAlt={this.state.selectedColorAlt} />
+                            <LedStrip ref={this.stripRef} count={40} radius={15} animation={this.state.selectedAnimation} color={this.state.selectedColor} colorAlt={this.state.selectedColorAlt} spectrum={this.state.selectedSpectrum} />
                         </div>
                     ) : (
-                        <div>
-                            <div>Status: <input type="checkbox" onChange={this.onStatusChange} checked={this.state.selectedStatus}/></div>
-                        </div>
+                        this.props.item.type == "LIGHT" ? (
+                            <div>
+                                <div>Status: <input type="checkbox" onChange={this.onStatusChange} checked={this.state.selectedStatus}/></div>
+                            </div>
+                        ) : (
+                            null
+                        )
                     )
                 }
                 <div className="element-save" onClick={this.onSaveElement}>Save</div>
