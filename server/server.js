@@ -37,7 +37,7 @@ if (localAddress == "") {
     }
 }
 
-let rpioPins = [];
+let rpioPins = [13,19,20,21,26,27];
 
 if(rpio !== null) {
     for (let i = 0; rpioPins.length; i++) {
