@@ -45,7 +45,7 @@ if(rpio !== null) {
     }
 }
 
-app.post("/lights", function (request, response) {
+app.post("/relay", function (request, response) {
     response.header("Access-Control-Allow-Origin", "*");
     console.log(response);
     let id = request.body.data.id;
