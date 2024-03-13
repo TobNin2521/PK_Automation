@@ -1,0 +1,21 @@
+.relay {
+    max-height: 4em;
+    overflow: hidden;
+    transition: all 300ms;
+    border-bottom: 1px solid #ccc;
+}
+.relay-header {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    height: 4em;
+}
+.relay-header > svg {
+    height: 2em;
+    margin-left: auto;
+    margin-right: 3em;
+}
+.relay-header > span {
+    font-size: 1.25em;
+    margin-left: 3em;
+}

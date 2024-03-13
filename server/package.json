@@ -4,9 +4,13 @@
     "description": "Automation webserver with UI to control lights/leds",
     "main": "app.js",
     "dependencies": {
+        "cors": "^2.8.5",
         "express": "^4.18.2",
         "jest": "^28.0.3",
-        "rpio": "^2.4.2"
+        "open": "^10.1.0",
+        "request": "^2.88.2",
+        "rpio": "^2.4.2",
+        "spotify-web-api-node": "^5.0.2"
     },
     "scripts": {
         "test": "jest"

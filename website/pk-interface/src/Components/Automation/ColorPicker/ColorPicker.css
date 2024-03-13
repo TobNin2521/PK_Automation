@@ -1,0 +1,40 @@
+
+
+.color-picker {
+    height: 10em;
+    width: 10em;
+    position: relative;
+}
+.color-pallete {
+    height: 10em;
+    width: 10em;
+    background: conic-gradient(#f00, #ff0, #0f0, #0ff, #00f, #f0f, #f00);
+    border-radius: 50%;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+.color-selector-container {
+    position: relative;
+    height: 10em;
+    width: 10em;
+}
+.color-selector {
+    position: absolute;
+    height: 2em;
+    width: 2em;
+    top: .25em;
+    left: 4em;
+    background-color: #fff;
+    border-radius: 50%;
+    filter: drop-shadow(2px 4px 6px #000);
+}
+.color-dot {
+    height: 5em;
+    width: 5em;
+    position: absolute;
+    top: 2.5em;
+    left: 2.5em;
+    background-color: #fff;
+    border-radius: 50%;
+}

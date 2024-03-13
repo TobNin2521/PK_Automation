@@ -1,0 +1,23 @@
+.queue-container {
+    max-height: calc(100vh - 10em);
+    overflow-y: auto;
+    background-color: #444;
+    color: #ddd;
+}
+.user-queue {
+    transform: scaleY(1);
+    transition: all 500ms ease-in-out;
+    border-bottom: 1px solid #666;
+}
+.queue-hidden{
+    transform: scaleY(0);
+    transition: all 500ms ease-in-out;
+}
+button[title='Devices'],
+button[title='Previous'],
+button[title='Next'] {
+    display: none;
+}
+.slider__track > div > span {
+    display: none !important;
+}

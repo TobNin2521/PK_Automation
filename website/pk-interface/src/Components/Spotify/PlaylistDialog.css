@@ -1,0 +1,67 @@
+.playlist-dialog {
+    height: 100%;
+    width: 100%;
+    position: absolute;
+    bottom: 0%;
+    left: 0%;
+    transition: all 500ms;
+    z-index: 999;
+    background-color: #333;
+    color: #ddd;
+    max-height: 100%;
+    overflow: hidden;
+}
+.hidden {
+    bottom: 100%;
+    transition: all 500ms;
+}
+.playlist-search {
+    border: none;
+    outline: none;
+    border-radius: 0;
+    background-color: #444;
+    height: 2em;
+    padding: .5em;
+    margin: 1em;
+    font-size: 1em;
+    color: #ddd;
+    flex-grow: 1;
+}
+.playlist-search:focus {
+    background-color: #555;
+}
+.settings-close-button {
+    height: 3em;
+    width: 3em;
+    padding: 1em;
+    cursor: pointer;
+    flex-grow: 0;
+}
+.dialog-title {
+    margin-left: 1em;
+}
+.curr-playlist-container {
+    margin: 1em;
+}
+.curr-playlist {
+    display: flex;
+    margin-top: 1em;
+}
+.curr-playlist > img {
+    height: 5em;
+}
+.curr-playlist-info {
+    margin-left: .5em;
+    align-self: center;
+}
+.curr-playlist-name {
+    font-size: 1.25em;
+}
+.curr-playlist-owner, .curr-playlist-tracks {
+    font-size: .75em;
+}
+.playlist-container {
+    margin: 1em;
+    overflow-y: auto;
+    max-height: calc(100% - 18em);
+}

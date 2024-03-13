@@ -1,0 +1,36 @@
+.track {
+    display: flex;
+    height: 4em;
+    flex-direction: row;
+    cursor: pointer;
+}
+.track-info-container {
+    display: flex;
+    justify-content: space-between;
+    column-gap: 20px;
+    width: 100%;
+}
+.track > img {
+    height: 3.5em;
+    margin: .25em;
+}
+.track-info, .track-album-info, .track-duration-info  {
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    min-width: 20em;
+}
+.track-name {
+    font-size: 1.25em;
+}
+.track-artist {
+    font-size: .75em;
+}
+.track-drag {
+    height: 3em;
+    margin: .5em;
+    float: right;
+}
+.track-drag > svg {
+    height: 3em;
+}

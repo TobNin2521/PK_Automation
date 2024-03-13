@@ -6,3 +6,11 @@
   flex-direction: row;
   justify-content: center;
 }
+.left-panel {
+  height: 100%;
+  width: 500px;
+}
+.right-panel {
+  height: 100%;
+  width: calc(100% - 500px);
+}
