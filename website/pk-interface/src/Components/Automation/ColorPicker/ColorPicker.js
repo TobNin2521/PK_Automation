@@ -111,6 +111,10 @@ export const ColorPicker = ({style, color, setColor}) => {
         }
     };
 
+    const IntArrToColor = (arr) => {
+        return "rgb(" + arr[0] + "," + arr[1] + "," + arr[2] + ")";
+    };
+
     return (
         <div className="color-picker" style={style}>
             <div className="color-pallete">
@@ -118,7 +122,7 @@ export const ColorPicker = ({style, color, setColor}) => {
                     <div className='color-selector' onMouseDown={() => setDragging(true)} onMouseUp={() => setDragging(false)} onTouchEnd={() => setDragging(false)} onTouchStart={() => setDragging(true)}></div>
                 </div>
             </div>            
-            <div className="color-dot">
+            <div className="color-dot" style={{backgroundColor: IntArrToColor(getColorFromAngle(angle))}}>
 
             </div>
         </div>

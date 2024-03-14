@@ -6,14 +6,14 @@ export const Relay = ({children, name, pin}) => {
     const [status, setStatus] = useState(false);
 
     useEffect(() => {
-        Get("http://192.168.178.47:8080/relay/status?id=" + pin, (res) => {
+        Get(window.location.origin + "/relay/status?id=" + pin, (res) => {
             setStatus(res.status);
         });
     }, []);
 
     //[33, 35, 38, 40, 37, 13]
     const switchOn = () => {
-        Post("http://192.168.178.47:8080/relay", {
+        Post(window.location.origin + "/relay", {
             id: pin,
             status: 1
         }, (res) => {
@@ -22,7 +22,7 @@ export const Relay = ({children, name, pin}) => {
     };
 
     const switchOff = () => {
-        Post("http://192.168.178.47:8080/relay", {
+        Post(window.location.origin + "/relay", {
             id: pin,
             status: 0
         }, (res) => {
@@ -31,7 +31,7 @@ export const Relay = ({children, name, pin}) => {
     };
 
     return (
-        <div className="relay" style={{maxHeight: children !== undefined && status === true ? "16em" : ""}}>
+        <div className="relay" style={{maxHeight: children !== undefined && status === true ? "17em" : ""}}>
             <div className="relay-header">
                 <span>{name}</span>
                 {status === true ? (

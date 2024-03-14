@@ -63,7 +63,6 @@ if (rpio !== null) {
 
 app.post("/relay", function (request, response) {
     response.header("Access-Control-Allow-Origin", "*");
-    console.log(response);
     let id = request.body.id;
     let status = request.body.status;
     rpioStatus[id.toString()] = Number(status) === 1;
@@ -100,68 +99,91 @@ const generateRandomString = (length) => {
 
 var SpotifyWebApi = require('spotify-web-api-node');
 
-var scopes = ['user-read-private', 'user-read-email'],
+var scopes = [
+    'streaming',
+    'user-read-email',
+    'user-read-private',
+    'user-library-read',
+    'user-library-modify',
+    'user-read-playback-state',
+    'user-modify-playback-state',
+    'playlist-read-private',
+    'playlist-read-collaborative',
+    'playlist-modify-private',
+    'playlist-modify-public'
+  ],
     redirectUri = 'http://localhost:8080/callback',
     clientId = '93f99cd3786048ae99ae5cd292283605',
+    clientSecret = '58f52f4a09434c5d955f1ea7bbe6fafc',
     state = generateRandomString(16),
-    showDialog = true,
+    showDialog = false,
     responseType = 'token';
 
 // Setting credentials can be done in the wrapper's constructor, or using the API object's setters.
 var spotifyApi = new SpotifyWebApi({
     redirectUri: redirectUri,
-    clientId: clientId
+    clientId: clientId,
+    clientSecret: clientSecret
 });
 
 // Create the authorization URL
 var authorizeURL = spotifyApi.createAuthorizeURL(
     scopes,
     state,
-    showDialog,
-    responseType
+    showDialog
 );
-var start = (process.platform == 'darwin' ? 'open' : process.platform == 'win32' ? 'start' : 'xdg-open');
-require('child_process').exec(start + ' ' + authorizeURL);
+
+app.get("/login", function(req, res) {
+    res.header("Access-Control-Allow-Origin", "*");
+    res.redirect(authorizeURL);
+});
 
 app.get("/callback", function (req, res) {
     res.header("Access-Control-Allow-Origin", "*");
-    console.log("CALLBACK");
+    let code = req.query.code;
+    spotifyApi.authorizationCodeGrant(code).then(
+        function(data) {
+          spotifyApi.setAccessToken(data.body['access_token']);
+          spotifyApi.setRefreshToken(data.body['refresh_token']);
+          res.send({status: "success", token: data.body['access_token'], refresh_token: data.body['refresh_token']});
+        },
+        function(err) {
+          console.log('Something went wrong!', err);
+          res.send({status: "error"});
+        }
+    );
+});
+
+app.get("/refresh", function(req, res) {
+    res.header("Access-Control-Allow-Origin", "*");
+    spotifyApi.refreshAccessToken().then(
+        function(data) {
+          console.log('The access token has been refreshed!');      
+          spotifyApi.setAccessToken(data.body['access_token']);
+          res.send({status: "success", token: data.body['access_token'], refresh_token: data.body['refresh_token']});
+        },
+        function(err) {
+          console.log('Could not refresh access token', err);
+          res.send({status: "error"});
+        }
+    );
 });
 
 
-//let privateKey = fs.readFileSync('sslcert/server.key', 'utf8');
-//let certificate = fs.readFileSync('sslcert/server.crt', 'utf8');
-
-//let credentials = { key: privateKey, cert: certificate };
 const allowedOrigins = ['www.example1.com', 'www.example2.com', 'http://localhost:3000'];
 app.use(cors({
     origin: function (origin, callback) {
         if (!origin) {
             return callback(null, true);
         }
-
-        /*if (allowedOrigins.includes(origin)) {
-            const msg = 'The CORS policy for this site does not allow access from the specified Origin.';
-            return callback(new Error(msg), false);
-        }*/
         return callback(null, true);
     }
 
 }));
 
 let httpServer = http.createServer(app);
-//let httpsServer = https.createServer(credentials, app);
 
 if (__useSSL) {
-    /*
-    let server = httpsServer.listen(HTTPS_PORT, function () {
-        console.log("***********************************************************************");
-        console.log(" PK Automation ");
-        console.log(" Web Server listening at the location below, or by host name and port. ");
-        console.log(" https://" + localAddress + ":" + HTTPS_PORT);
-        console.log("***********************************************************************");
-    });
-    */
 }
 else {
     let server = httpServer.listen(HTTP_PORT, function () {

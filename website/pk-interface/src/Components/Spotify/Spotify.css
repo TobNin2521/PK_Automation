@@ -1,6 +1,7 @@
 .Spotify {
   width: 100%;
   height: 100%;
+  position: relative;
 }
 .fa-primary {
   fill: #469c00;

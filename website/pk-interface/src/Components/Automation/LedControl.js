@@ -21,7 +21,6 @@ export const LedControl = ({address}) => {
     }, [address]);
 
     const setColor = (col) => {
-        console.log(col);
         Post(address + "/json/state", {"seg": [{ "col": [col] }] }, (res) => {
             
         });
