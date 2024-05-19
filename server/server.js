@@ -57,7 +57,7 @@ let rpioStatus = {
 
 if (rpio !== null) {
     for (let i = 0; i < rpioPins.length; i++) {
-        rpio.open(rpioPins[i], rpio.OUTPUT, rpio.LOW);
+        rpio.open(rpioPins[i], rpio.OUTPUT, rpio.HIGH);
     }
 }
 
@@ -70,7 +70,7 @@ app.post("/relay", function (request, response) {
     console.log("Set Pin " + id + " to " + (Number(status) === 0 ? "LOW" : "HIGH"));
 
     if (rpio !== null) {
-        rpio.write(Number(id), Number(status) === 0 ? rpio.LOW : rpio.HIGH);
+        rpio.write(Number(id), Number(status) === 1 ? rpio.LOW : rpio.HIGH);
     }
 
     response.status(200).send({ result: "success" });
