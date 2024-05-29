@@ -9,12 +9,13 @@ export const Spotify = () => {
   const [refreshToken, setRefreshToken] = useState("");
   const [playlistId, setPlaylistId] = useState("");
   const [showPlaylistDialog, setShowPlaylistDialog] = useState(false);
+  const ADDRESS = "http://192.168.178.47:8080";//window.location.origin
   
   useEffect(() => {
-    setTimeout(() => {
+    /*setTimeout(() => {
       getTokens();
       checkForPlaylist();
-    }, 2000);
+    }, 2000);*/
   }, []);
 
   const getTokens = () => {
@@ -25,7 +26,7 @@ export const Spotify = () => {
   };
 
   const refresh = () => {
-    Get(window.location.origin + "/refresh", (res) => {
+    Get(ADDRESS + "/refresh", (res) => {
       setToken(res.token);
       setRefreshToken(res.refresh_token);
     });
@@ -49,7 +50,7 @@ export const Spotify = () => {
     <div className="Spotify">
       <PlaylistDialog visible={showPlaylistDialog} token={token} playlistId={playlistId} onHide={() => setShowPlaylistDialog(false)} setPlaylistId={(id) => {setPlaylistId(id); localStorage.setItem("pk-playlist", id)}}/>
       <Content token={token} playlistId={playlistId} showSettings={() => setShowPlaylistDialog(true)} />
-      <iframe id='token-frame' src={window.location.origin + '/login'} style={{display: 'none'}}></iframe>
+      <iframe id='token-frame' src={ADDRESS + '/login'} style={{display: 'none'}}></iframe>
     </div>
   );
 };

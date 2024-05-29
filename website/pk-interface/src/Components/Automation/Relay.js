@@ -4,16 +4,17 @@ import './Relay.css';
 
 export const Relay = ({children, name, pin}) => {
     const [status, setStatus] = useState(false);
+    const ADDRESS = "http://192.168.178.47:8080";//window.location.origin
 
     useEffect(() => {
-        Get(window.location.origin + "/relay/status?id=" + pin, (res) => {
+        Get(ADDRESS + "/relay/status?id=" + pin, (res) => {
             setStatus(res.status);
         });
     }, []);
 
     //[33, 35, 38, 40, 37, 13]
     const switchOn = () => {
-        Post(window.location.origin + "/relay", {
+        Post(ADDRESS + "/relay", {
             id: pin,
             status: 1
         }, (res) => {
@@ -22,7 +23,7 @@ export const Relay = ({children, name, pin}) => {
     };
 
     const switchOff = () => {
-        Post(window.location.origin + "/relay", {
+        Post(ADDRESS + "/relay", {
             id: pin,
             status: 0
         }, (res) => {
@@ -31,7 +32,7 @@ export const Relay = ({children, name, pin}) => {
     };
 
     return (
-        <div className="relay" style={{maxHeight: children !== undefined && status === true ? "17em" : ""}}>
+        <div className="relay" style={{maxHeight: children !== undefined && status === true ? ((children.length * 17) + "em") : ""}}>
             <div className="relay-header">
                 <span>{name}</span>
                 {status === true ? (
