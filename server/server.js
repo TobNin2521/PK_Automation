@@ -19,6 +19,7 @@ let bodyParser = require("body-parser");
 let path = require("path");
 let fs = require("fs");
 let request = require('request');
+const crypto = require("crypto");
 
 if (__deployment) {
     app.use(express.static(path.join(__dirname, "/public/dev/dist/build")));
