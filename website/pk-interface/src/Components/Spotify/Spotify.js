@@ -2,20 +2,19 @@ import { useEffect, useRef, useState } from 'react';
 import './Spotify.css';
 import { PlaylistDialog } from './PlaylistDialog';
 import { Content } from './Content';
-import { Get } from '../../Logik/Network';
+import ADDRESS, { Get } from '../../Logik/Network';
 
 export const Spotify = () => {  
   const [token, setToken] = useState("");
   const [refreshToken, setRefreshToken] = useState("");
   const [playlistId, setPlaylistId] = useState("");
   const [showPlaylistDialog, setShowPlaylistDialog] = useState(false);
-  const ADDRESS = "http://192.168.178.47:8080";//window.location.origin
   
   useEffect(() => {
-    /*setTimeout(() => {
+    setTimeout(() => {
       getTokens();
       checkForPlaylist();
-    }, 2000);*/
+    }, 2000);
   }, []);
 
   const getTokens = () => {
@@ -49,7 +48,7 @@ export const Spotify = () => {
   return (
     <div className="Spotify">
       <PlaylistDialog visible={showPlaylistDialog} token={token} playlistId={playlistId} onHide={() => setShowPlaylistDialog(false)} setPlaylistId={(id) => {setPlaylistId(id); localStorage.setItem("pk-playlist", id)}}/>
-      <Content token={token} playlistId={playlistId} showSettings={() => setShowPlaylistDialog(true)} />
+      <Content token={token} playlistId={playlistId} showSettings={() => setShowPlaylistDialog(true)}/>
       <iframe id='token-frame' src={ADDRESS + '/login'} style={{display: 'none'}}></iframe>
     </div>
   );

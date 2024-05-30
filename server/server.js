@@ -20,6 +20,7 @@ let path = require("path");
 let fs = require("fs");
 let request = require('request');
 const crypto = require("crypto");
+const helmet = require('helmet');
 
 if (__deployment) {
     app.use(express.static(path.join(__dirname, "/public/dev/dist/build")));
@@ -29,6 +30,7 @@ else {
 }
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(helmet.frameguard());
 
 let HTTP_PORT = 8080;
 let HTTPS_PORT = 8443;
@@ -134,8 +136,18 @@ var authorizeURL = spotifyApi.createAuthorizeURL(
     showDialog
 );
 
+app.all('*', function(req, res, next) {
+    res.header('Access-Control-Allow-Origin', '*');
+    res.header('Access-Control-Allow-Methods', 'PUT, GET, POST, DELETE, OPTIONS');
+    res.header('Access-Control-Allow-Headers', 'Content-Type');
+    next();
+});
+
 app.get("/login", function(req, res) {
     res.header("Access-Control-Allow-Origin", "*");
+    res.header('Access-Control-Allow-Methods', 'PUT, GET, POST, DELETE, OPTIONS');
+    res.header('Access-Control-Allow-Headers', 'Content-Type');
+    res.header('Content-Security-Policy', 'frame-ancestors http://localhost:3000');
     res.redirect(authorizeURL);
 });
 
@@ -171,7 +183,7 @@ app.get("/refresh", function(req, res) {
 });
 
 
-const allowedOrigins = ['www.example1.com', 'www.example2.com', 'http://localhost:3000'];
+const allowedOrigins = ['www.example1.com', 'www.example2.com', 'http://localhost:3000', 'http://localhost:8080', "http://192.168.56.1:3000", "http://192.168.56.1:8080"];
 app.use(cors({
     origin: function (origin, callback) {
         if (!origin) {

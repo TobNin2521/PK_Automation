@@ -17,7 +17,7 @@
     margin: .5em;
 }
 .player-track {
-    max-width: 500px;
+    max-width: 200px;
     height: 5px;
     width: 100vw;
     background-color: #555;
@@ -42,8 +42,12 @@
     flex-direction: column;
 }
 .current-name {
-    font-size: 1.25em;
-    color: #fff;
+    font-size: .7em;
+    color: #ddd;
+}
+.current-artist {
+    font-size: .5em;
+    color: #ccc;
 }
 .volume-slider{
     flex-grow: 0;

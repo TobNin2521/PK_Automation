@@ -51,7 +51,7 @@ export const Track = ({track, type, index, moveTrack}) => {
     drag(drop(ref));
 
     const style = {
-        border: '1px solid #666',
+        borderBottom: '2px solid #333',
         padding: '0.5rem 1rem',
         backgroundColor: '#444',
         cursor: 'move',
@@ -63,9 +63,6 @@ export const Track = ({track, type, index, moveTrack}) => {
                 <div className='track-info'>
                     <div className='track-name'>{track.name}</div>
                     <div className='track-artist'>{track.artists[0].name}</div>
-                </div>
-                <div className='track-album-info'>
-                    <div className='track-album'>{track.album.name}</div>
                 </div>
                 <div className='track-duration-info'>
                     <div className='track-duration'>{Math.floor(track.duration_ms / 60000)}:{Math.floor((track.duration_ms % 60000) / 1000).toString().padStart(2, "0")}</div>

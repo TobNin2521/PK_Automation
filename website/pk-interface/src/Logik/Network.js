@@ -1,3 +1,5 @@
+const ADDRESS = "http://localhost:8080";// "http://192.168.178.47:8080";
+export default ADDRESS;
 
 function Get(url, cb) {
     fetch(url).then(res => res.json()).then((js) => {

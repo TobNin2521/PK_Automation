@@ -1,11 +1,10 @@
 import { useEffect, useState } from "react";
-import { Get, Post } from "../../Logik/Network";
+import ADDRESS, { Get, Post } from "../../Logik/Network";
 import './Relay.css';
 
 export const Relay = ({children, name, pin}) => {
-    const [status, setStatus] = useState(false);
-    const ADDRESS = "http://192.168.178.47:8080";//window.location.origin
-
+    const [status, setStatus] = useState(true);
+    
     useEffect(() => {
         Get(ADDRESS + "/relay/status?id=" + pin, (res) => {
             setStatus(res.status);
@@ -32,7 +31,7 @@ export const Relay = ({children, name, pin}) => {
     };
 
     return (
-        <div className="relay" style={{maxHeight: children !== undefined && status === true ? ((children.length * 17) + "em") : ""}}>
+        <div className="relay" style={{maxHeight: children !== undefined && status === true ? ((children.length * 15) + "em") : ""}}>
             <div className="relay-header">
                 <span>{name}</span>
                 {status === true ? (

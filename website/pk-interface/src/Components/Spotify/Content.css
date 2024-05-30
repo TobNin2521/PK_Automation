@@ -1,5 +1,5 @@
 .queue-container {
-    max-height: calc(100vh - 10em);
+    max-height: calc(600px - 10em);
     overflow-y: auto;
     background-color: #444;
     color: #ddd;

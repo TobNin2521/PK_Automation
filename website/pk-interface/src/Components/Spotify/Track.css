@@ -20,6 +20,9 @@
     flex-direction: column;
     min-width: 20em;
 }
+.track-duration-info  {
+    min-width: 5em;
+}
 .track-name {
     font-size: 1.25em;
 }
