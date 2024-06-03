@@ -58,7 +58,7 @@
     height: 2em;
     margin: 1.5em;
 }
-input[type="range"] {
+input[type="range"]:not(.color-slider) {
     margin: 1em;
     -webkit-appearance: none;
     appearance: none;
@@ -66,16 +66,16 @@ input[type="range"] {
     cursor: pointer;
     width: 10em;
 }
-input[type="range"]::-webkit-slider-runnable-track {
+input[type="range"]:not(.color-slider)::-webkit-slider-runnable-track {
     background: #555;
     height: 0.5em;
 }  
 /******** Firefox ********/
-input[type="range"]::-moz-range-track {
+input[type="range"]:not(.color-slider)::-moz-range-track {
     background: #555;
     height: 0.5em;
 }
-input[type="range"]::-webkit-slider-thumb {
+input[type="range"]:not(.color-slider)::-webkit-slider-thumb {
     -webkit-appearance: none; /* Override default look */
     appearance: none;
     margin-top: -.75em; /* Centers thumb on the track */

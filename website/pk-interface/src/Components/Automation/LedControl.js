@@ -3,23 +3,28 @@ import { ColorPicker } from './ColorPicker/ColorPicker';
 import './LedControl.css';
 import { Get, Post } from '../../Logik/Network';
 import { EffectPicker } from './EffectPicker';
+import { ColorPickerV2 } from './ColorPicker/ColorPickerV2';
 
 export const LedControl = ({name, address}) => {
     const [value, setValue] = useState(null);
-    const [effectSource, setEffectSource] = useState(["Effect 1", "Effect 2", "Effect 3", "Effect 4", "Effect 5", "Effect 6", "Effect 7", "Effect 8", "Effect 9"]);
+    const [effectSource, setEffectSource] = useState(["Effect 1", "Effect 2", "Effect 3", "Effect 4", "Effect 5", "Effect 6", "Effect 7", "Effect 8", "Effect 9", "Effect 1", "Effect 2", "Effect 3", "Effect 4", "Effect 5", "Effect 6", "Effect 7", "Effect 8", "Effect 9", "Effect 1", "Effect 2", "Effect 3", "Effect 4", "Effect 5", "Effect 6", "Effect 7", "Effect 8", "Effect 9"]);
     const [effect, setEffect] = useState(0);
     const [brightness, setBrightness] = useState(-1);
 
     useEffect(() => {
         if(address !== undefined && address !== null && address !== "") {
-            Get(address + "/json", (res) => {
-                setValue(res);
-                setEffectSource(res.effects);
-                setEffect(res.state.seg[0].fx);
-                setBrightness(res.state.bri);
-            });
-        }
+            getJsonValues();
+        }        
     }, [address]);
+
+    const getJsonValues = () => {
+        Get(address + "/json", (res) => {
+            setValue(res);
+            setEffectSource(res.effects);
+            setEffect(res.state.seg[0].fx);
+            setBrightness(res.state.bri);
+        });
+    };
 
     const setColor = (col) => {
         Post(address + "/json/state", {"seg": [{ "col": [col] }] }, (res) => {
@@ -45,7 +50,7 @@ export const LedControl = ({name, address}) => {
         <div className="led-control">
             <div>
                 <span>{name}</span>
-                <ColorPicker color={value !== null ? value.state.seg[0].col[0] : [255, 0, 0]} setColor={setColor} />
+                <ColorPicker name={name} color={value !== null ? value.state.seg[0].col[0] : [255, 0, 0]} setColor={setColor} onReload={getJsonValues}/>
             </div>
             <div>
                 <EffectPicker effect={effect} source={effectSource} onPick={onChangeEffect} />
@@ -54,3 +59,6 @@ export const LedControl = ({name, address}) => {
         </div>
     )
 };
+/*
+                <ColorPickerV2 color={value !== null ? value.state.seg[0].col[0] : [255, 0, 0]} setColor={setColor} />
+ */

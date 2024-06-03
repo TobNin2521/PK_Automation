@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import './ColorPicker.css';
 
-export const ColorPicker = ({style, color, setColor}) => {
+export const ColorPicker = ({name, style, color, setColor, onReload}) => {
     const [angle, setAngle] = useState(0);
     const [dragging, setDragging] = useState(false);
 
@@ -92,7 +92,7 @@ export const ColorPicker = ({style, color, setColor}) => {
 
     const onPalleteRotate = (e) => {
         if (dragging === true) {
-            let box = document.querySelector(".color-selector-container");
+            let box = document.querySelector("#" + name + " .color-selector-container");
             let boxBoundingRect = box.getBoundingClientRect();
             let boxCenter = {
                 x: boxBoundingRect.left + boxBoundingRect.width / 2,
@@ -111,18 +111,37 @@ export const ColorPicker = ({style, color, setColor}) => {
         }
     };
 
+    const onPalleteClick = (e) => {
+        let box = document.querySelector("#" + name + " .color-selector-container");
+        let boxBoundingRect = box.getBoundingClientRect();
+        let boxCenter = {
+            x: boxBoundingRect.left + boxBoundingRect.width / 2,
+            y: boxBoundingRect.top + boxBoundingRect.height / 2
+        };
+        let pX = e.pageX, pY = e.pageY;
+        if (!pX || !pY) {
+            pX = e.touches[0].pageX;
+            pY = e.touches[0].pageY;
+        }
+        let angle = Math.atan2(pX - boxCenter.x, - (pY - boxCenter.y)) * (180 / Math.PI);
+        if (angle < 0) angle += 360;
+        angle = angle % 360;
+        setAngle(angle);
+        setColor(getColorFromAngle(angle));
+    };
+
     const IntArrToColor = (arr) => {
         return "rgb(" + arr[0] + "," + arr[1] + "," + arr[2] + ")";
     };
 
     return (
-        <div className="color-picker" style={style}>
+        <div id={name} className="color-picker" style={style}>
             <div className="color-pallete">
-                <div className='color-selector-container' style={{transform: 'rotate(' + angle + 'deg)'}} onTouchEnd={() => setDragging(false)} onMouseLeave={() => setDragging(false)} onMouseMove={onPalleteRotate} onTouchMove={onPalleteRotate}>
+                <div className='color-selector-container' style={{transform: 'rotate(' + angle + 'deg)'}} onTouchEnd={() => setDragging(false)} onMouseLeave={() => setDragging(false)} onMouseMove={onPalleteRotate} onTouchMove={onPalleteRotate} onClick={(e) => onPalleteClick(e)}>
                     <div className='color-selector' onMouseDown={() => setDragging(true)} onMouseUp={() => setDragging(false)} onTouchEnd={() => setDragging(false)} onTouchStart={() => setDragging(true)}></div>
                 </div>
             </div>            
-            <div className="color-dot" style={{backgroundColor: IntArrToColor(getColorFromAngle(angle))}}>
+            <div className="color-dot" style={{backgroundColor: IntArrToColor(getColorFromAngle(angle))}} onClick={() => onReload()}>
 
             </div>
         </div>

@@ -1,0 +1,34 @@
+.color-slider {
+    width: 10em !important;
+    height: 3em !important;
+    overflow: hidden !important;
+    cursor: pointer !important;
+    transform: rotate(90deg);
+}
+.color-slider,
+.color-slider::-webkit-slider-runnable-track,
+.color-slider::-webkit-slider-thumb {
+  -webkit-appearance: none !important;
+}
+.color-slider::-webkit-slider-runnable-track {
+    width: 10em !important;
+    height: 3em !important;
+    background: linear-gradient(90deg, #f00, #ff0, #0f0, #0ff, #00f, #f0f) !important;
+}
+.color-slider::-webkit-slider-thumb {
+  position: relative !important;
+  height: 3em !important;
+  width: 3em !important;
+  background: steelblue !important;
+  border-radius: 50% !important;
+  border: 2px solid white !important;
+}
+.color-slider::-webkit-slider-thumb::before {
+  position: absolute !important;
+  content: '' !important;
+  height: 3em !important; /* equal to height of runnable track */
+  width: 500px !important; /* make this bigger than the widest range input element */
+  left: -502px !important; /* this should be -2px - width */
+  top: 8px !important; /* don't change this */
+  background: #777 !important;
+}
