@@ -6,9 +6,12 @@ export const Relay = ({children, name, pin}) => {
     const [status, setStatus] = useState(true);
     
     useEffect(() => {
-        Get(ADDRESS + "/relay/status?id=" + pin, (res) => {
-            setStatus(res.status);
-        });
+        try{
+            Get(ADDRESS + "/relay/status?id=" + pin, (res) => {
+                setStatus(res.status);
+            });
+        }
+        catch(e){}
     }, []);
 
     //[33, 35, 38, 40, 37, 13]

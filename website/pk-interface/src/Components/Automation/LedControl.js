@@ -28,21 +28,21 @@ export const LedControl = ({name, address}) => {
 
     const setColor = (col) => {
         Post(address + "/json/state", {"seg": [{ "col": [col] }] }, (res) => {
-            
+            getJsonValues();
         });
     };
 
     const onChangeEffect = (val) => {
         setEffect(Number(val));
         Post(address + "/json/state", { "seg": [{ "fx": Number(val) }] }, (res) => {
-
+            getJsonValues();
         });
     };
 
     const onChangeBrightness = (e) => {
         setBrightness(Number(e.target.value));
         Post(address + "/json/state", { "bri": Number(e.target.value) }, (res) => {
-
+            getJsonValues();
         });
     };
 

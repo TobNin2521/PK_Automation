@@ -4,7 +4,7 @@ import { GetPlaylist, GetSearch } from '../../Logik/SpotifyUtils';
 import { PlaylistItem } from './PlaylistItem';
 import { KeybordComp } from '../Keyboard';
 
-export const PlaylistDialog = ({visible, token, playlistId, onHide, setPlaylistId}) => {
+export const PlaylistDialog = ({visible, playlistId, onHide, setPlaylistId}) => {
     const [searchVal, setSearchVal] = useState("");
     const [playlists, setPlaylists] = useState([]);
     const [showCurrPlaylist, setShowCurrPlaylist] = useState(false);
@@ -13,21 +13,21 @@ export const PlaylistDialog = ({visible, token, playlistId, onHide, setPlaylistI
 
     useEffect(() => {
         if(searchVal !== "") {
-            GetSearch(token, {
+            GetSearch(window.token, {
                 q: searchVal,
                 type: "playlist"
             }).then(res => setPlaylists(res.data.playlists.items));
         }
-    }, [searchVal, token]);
+    }, [searchVal]);
 
     useEffect(() => {
         if(playlistId !== undefined && playlistId !== null && playlistId !== "") {
-            GetPlaylist(token, playlistId).then(res => {
+            GetPlaylist(window.token, playlistId).then(res => {
                 setCurrPlaylist(res.data);
                 setShowCurrPlaylist(playlistId !== undefined && playlistId !== null && playlistId !== "");
             });
         }
-    }, [playlistId, token]);
+    }, [playlistId]);
     
     const keyboardPress = (key) => {
         if(key === '{⌨}') {

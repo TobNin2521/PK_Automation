@@ -147,7 +147,7 @@ app.get("/login", function(req, res) {
     res.header("Access-Control-Allow-Origin", "*");
     res.header('Access-Control-Allow-Methods', 'PUT, GET, POST, DELETE, OPTIONS');
     res.header('Access-Control-Allow-Headers', 'Content-Type');
-    res.header('Content-Security-Policy', 'frame-ancestors http://localhost:3000');
+    res.header('Content-Security-Policy', 'frame-ancestors http://localhost:8080');
     res.redirect(authorizeURL);
 });
 

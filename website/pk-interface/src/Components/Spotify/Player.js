@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import './Player.css';
+import ADDRESS, { Get } from "../../Logik/Network";
 
-export const Player = ({token, actTrack, trackFinished, onStart}) => {
+export const Player = ({actTrack, trackFinished, onStart}) => {
     const [showPlayer, setShowPlayer] = useState(false);
     const [deviceId, setDeviceId] = useState(null);
     const [started, setStarted] = useState(false);
@@ -10,11 +11,13 @@ export const Player = ({token, actTrack, trackFinished, onStart}) => {
     const [playerTimerId, setPlayerTimerId] = useState(-1);
     const [trackProgress, setTrackProgress] = useState(0);
     const [currentTrack, setCurrentTrack] = useState(null);
+    const [playerInitialized, setPlayerInitialized] = useState(false);
 
     const player = useRef(null);
 
     useEffect(() => {
-        if(token !== undefined && token !== null && token !== "") {
+        if(window.token !== undefined && window.token !== null && window.token !== "" && playerInitialized === false) {
+            setPlayerInitialized(true);
             const script = document.createElement("script");
             script.src = "https://sdk.scdn.co/spotify-player.js";
             script.async = true;        
@@ -22,7 +25,7 @@ export const Player = ({token, actTrack, trackFinished, onStart}) => {
             window.onSpotifyWebPlaybackSDKReady = () => {
                 player.current = new window.Spotify.Player({
                     name: 'PK Spotify Player',
-                    getOAuthToken: cb => { cb(token); },
+                    getOAuthToken: getAuthTokenCallback,
                     volume: volume
                 });
                 player.current.addListener('ready', playerReady); 
@@ -32,17 +35,26 @@ export const Player = ({token, actTrack, trackFinished, onStart}) => {
                 player.current.connect();
             }   
         }
-    }, [token]);
+    }, []);
+
+    const getAuthTokenCallback = (callback) => {
+        console.log("New Token");
+        Get(ADDRESS + "/refresh", (res) => {
+          console.log("Refreshed token: " + res.token);
+          window.token = res.token;
+          callback(res.token);
+        });
+    };
 
     useEffect(() => {     
         if(actTrack !== undefined && actTrack !== null && actTrack !== "" &&
-            token !== undefined && token !== null && token !== "" && playing === true) {
+            window.token !== undefined && window.token !== null && window.token !== "" && playing === true) {
             fetch(`https://api.spotify.com/v1/me/player/play?device_id=${deviceId}`, {
                 method: 'PUT',
                 body: JSON.stringify({ uris: ['spotify:track:' + actTrack] }),
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
+                    'Authorization': `Bearer ${window.token}`
                 }
             }).then((data) => {
                 if(playerTimerId < 0) {
@@ -61,7 +73,7 @@ export const Player = ({token, actTrack, trackFinished, onStart}) => {
                 console.log(err);
             });
         }
-    }, [actTrack, token, started]);
+    }, [actTrack, started]);
 
     useEffect(() => {
         if(trackProgress > 0.995) {

@@ -9,7 +9,7 @@ import { HTML5Backend } from 'react-dnd-html5-backend'
 import './Content.css';
 import { Player } from './Player';
 
-export const Content = ({token, playlistId, showSettings}) => {
+export const Content = ({playlistId, showSettings}) => {
     const [plTracks, setPlTracks] = useState([]);
     const [userTracks, setUserTracks] = useState([]);
     const [playing, setPlaying] = useState(false);
@@ -23,7 +23,7 @@ export const Content = ({token, playlistId, showSettings}) => {
 
     let _tracks = [];
     const getPlTracks = (url) => {
-        GetPlaylistTracks(token, playlistId, url).then(res => {
+        GetPlaylistTracks(window.token, playlistId, url).then(res => {
             if(res.data.next !== null) {
                 _tracks = [..._tracks, ...res.data.items];
                 getPlTracks(res.data.next);
@@ -37,7 +37,7 @@ export const Content = ({token, playlistId, showSettings}) => {
     };
 
     const addUserTrack = (id) => {
-        GetTrack(token, id).then(res => {
+        GetTrack(window.token, id).then(res => {
             let track = {track : res.data};
             setUserTracks([...userTracks, track]);
         })
@@ -107,7 +107,7 @@ export const Content = ({token, playlistId, showSettings}) => {
 
     return (
         <div className="content">
-            <TopBar token={token} addTrack={addUserTrack} showSettings={showSettings} />
+            <TopBar addTrack={addUserTrack} showSettings={showSettings} />
             <div className='queue-container'>                
                 <DndProvider backend={HTML5Backend}>
                     <div className={userTracks.length > 0 ? 'user-queue' : 'user-queue queue-hidden'}>
@@ -124,7 +124,7 @@ export const Content = ({token, playlistId, showSettings}) => {
                     </div>
                 </DndProvider>
             </div>
-            <Player token={token} actTrack={currentTrackId} trackFinished={trackFinished} onStart={trackFinished} />
+            <Player actTrack={currentTrackId} trackFinished={trackFinished} onStart={trackFinished} />
         </div>
     );
 };

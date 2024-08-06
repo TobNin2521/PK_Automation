@@ -5,10 +5,9 @@ import { Content } from './Content';
 import ADDRESS, { Get } from '../../Logik/Network';
 
 export const Spotify = () => {  
-  const [token, setToken] = useState("");
-  const [refreshToken, setRefreshToken] = useState("");
   const [playlistId, setPlaylistId] = useState("");
   const [showPlaylistDialog, setShowPlaylistDialog] = useState(false);
+  const [spotifyInitialized, setSpotifyInitialized] = useState(false);
   
   useEffect(() => {
     setTimeout(() => {
@@ -19,22 +18,8 @@ export const Spotify = () => {
 
   const getTokens = () => {
     let res = JSON.parse(document.getElementById('token-frame').contentWindow.document.getElementsByTagName("body")[0].innerText);
-    setToken(res.token);
-    setRefreshToken(res.refresh_token);
-    startExpirationTimer();
-  };
-
-  const refresh = () => {
-    Get(ADDRESS + "/refresh", (res) => {
-      setToken(res.token);
-      setRefreshToken(res.refresh_token);
-    });
-  };
-
-  const startExpirationTimer = () => {
-    setInterval(() => {
-      refresh();
-    }, (60 * 60 * 1000) - 10000);
+    window.token = res.token;
+    setSpotifyInitialized(true);
   };
 
   const checkForPlaylist = () => {
@@ -47,8 +32,10 @@ export const Spotify = () => {
 
   return (
     <div className="Spotify">
-      <PlaylistDialog visible={showPlaylistDialog} token={token} playlistId={playlistId} onHide={() => setShowPlaylistDialog(false)} setPlaylistId={(id) => {setPlaylistId(id); localStorage.setItem("pk-playlist", id)}}/>
-      <Content token={token} playlistId={playlistId} showSettings={() => setShowPlaylistDialog(true)}/>
+      {spotifyInitialized === true ? (<>
+        <PlaylistDialog visible={showPlaylistDialog} playlistId={playlistId} onHide={() => setShowPlaylistDialog(false)} setPlaylistId={(id) => {setPlaylistId(id); localStorage.setItem("pk-playlist", id)}}/>
+        <Content playlistId={playlistId} showSettings={() => setShowPlaylistDialog(true)}/>
+      </>) : null}
       <iframe id='token-frame' src={ADDRESS + '/login'} style={{display: 'none'}}></iframe>
     </div>
   );

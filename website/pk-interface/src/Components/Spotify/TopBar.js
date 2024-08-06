@@ -3,7 +3,7 @@ import { GetSearch } from "../../Logik/SpotifyUtils";
 import './TopBar.css';
 import { KeybordComp } from "../Keyboard";
 
-export const TopBar = ({token, addTrack, showSettings}) => {
+export const TopBar = ({addTrack, showSettings}) => {
     const [searchVal, setSearchVal] = useState("");
     const [searchTracks, setSearchTracks] = useState([]);
     const [showSearchResults, setShowSearchResults] = useState(false);
@@ -11,7 +11,7 @@ export const TopBar = ({token, addTrack, showSettings}) => {
 
     useEffect(() => {
         if(searchVal !== "") {
-            GetSearch(token, {
+            GetSearch(window.token, {
                 q: searchVal,
                 type: "track"
             }).then(res => setSearchTracks(res.data.tracks.items));
