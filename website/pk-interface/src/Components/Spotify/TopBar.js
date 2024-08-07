@@ -29,6 +29,13 @@ export const TopBar = ({addTrack, showSettings}) => {
         }
     };
 
+    const onAddTrackClick = (trackId) => {
+        setSearchVal("");
+        setShowKeyboard(false);
+        setShowSearchResults(false);
+        addTrack(trackId)
+    };
+
     return (
         <>
             <div className="top-bar">
@@ -43,7 +50,7 @@ export const TopBar = ({addTrack, showSettings}) => {
             <div className={showSearchResults === true && searchVal !== "" ? "track-search-results" : "track-search-results results-hidden"}>
                 {searchTracks.map((item, index) => {
                     return (
-                        <div key={index} className="track-search-result" onClick={()=>addTrack(item.id)}>
+                        <div key={index} className="track-search-result" onClick={()=>onAddTrackClick(item.id)}>
                             <img src={item.album.images[0].url} />
                             <div className="track-info">
                                 <div className="track-name">{item.name}</div>

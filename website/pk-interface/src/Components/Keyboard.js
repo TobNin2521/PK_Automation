@@ -6,7 +6,19 @@ export const KeybordComp = ({showKeyboard, setKeyboardValue, onKeyboardPress}) =
     const [show, setShow] = useState(false);
 
     useEffect(() => {
-        setShow(showKeyboard);
+        window.addEventListener("closeAllKeyboards", (e) => {
+            setShow(false);
+        }, false);
+    }, []);
+
+    useEffect(() => {
+        if(showKeyboard === true) {
+            const event = new Event("closeAllKeyboards");
+            window.dispatchEvent(event);
+        }
+        setTimeout(() => {
+            setShow(showKeyboard);
+        }, 500);
     }, [showKeyboard]);
 
     return (

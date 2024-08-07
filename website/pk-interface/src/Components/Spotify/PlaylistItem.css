@@ -16,3 +16,8 @@
     align-self: center;
     margin-left: .5em;
 }
+.playlist-tracks {
+    align-self: center;
+    margin-left: auto;
+    margin-right: 1em;
+}

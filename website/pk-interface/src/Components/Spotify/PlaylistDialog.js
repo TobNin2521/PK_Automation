@@ -40,7 +40,7 @@ export const PlaylistDialog = ({visible, playlistId, onHide, setPlaylistId}) => 
             <div className={visible === true ? "playlist-dialog" : "playlist-dialog hidden"}>
                 <div style={{height: "5em", display: "flex", flexDirection: "row"}}>
                     <input className='playlist-search' type='text' placeholder='Search' value={searchVal} onChange={(e) => setSearchVal(e.target.value)}  onFocus={() => setShowKeyboard(true)}/>
-                    <div className="settings-close-button" onClick={() => {onHide(); setShowKeyboard(false);}}>
+                    <div className="settings-close-button" onClick={() => {onHide(); setShowKeyboard(false); setSearchVal(""); setPlaylists([]);}}>
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
                             <path className="fa-primary" d="M209 175c-9.4-9.4-24.6-9.4-33.9 0s-9.4 24.6 0 33.9l47 47-47 47c-9.4 9.4-9.4 24.6 0 33.9s24.6 9.4 33.9 0l47-47 47 47c9.4 9.4 24.6 9.4 33.9 0s9.4-24.6 0-33.9l-47-47 47-47c9.4-9.4 9.4-24.6 0-33.9s-24.6-9.4-33.9 0l-47 47-47-47z"/>
                             <path className="fa-secondary" d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM175 175c9.4-9.4 24.6-9.4 33.9 0l47 47 47-47c9.4-9.4 24.6-9.4 33.9 0s9.4 24.6 0 33.9l-47 47 47 47c9.4 9.4 9.4 24.6 0 33.9s-24.6 9.4-33.9 0l-47-47-47 47c-9.4 9.4-24.6 9.4-33.9 0s-9.4-24.6 0-33.9l47-47-47-47c-9.4-9.4-9.4-24.6 0-33.9z"/>
