@@ -19,10 +19,13 @@ export const LedControl = ({name, address}) => {
 
     const getJsonValues = () => {
         Get(address + "/json", (res) => {
+            console.log(res);
             setValue(res);
             setEffectSource(res.effects);
-            setEffect(res.state.seg[0].fx);
-            setBrightness(res.state.bri);
+            if(res.state !== undefined){
+                if(res.state.seg !== undefined) setEffect(res.state.seg[0].fx);
+                if(res.state.bri !== undefined) setBrightness(res.state.bri);
+            }            
         });
     };
 
@@ -50,7 +53,7 @@ export const LedControl = ({name, address}) => {
         <div className="led-control">
             <div>
                 <span>{name}</span>
-                <ColorPicker name={name} color={value !== null ? value.state.seg[0].col[0] : [255, 0, 0]} setColor={setColor} onReload={getJsonValues}/>
+                <ColorPicker name={name} color={value !== null && value.state !== undefined && value.state !== null && value.state.seg !== undefined && value.state.seg !== null ? value.state.seg[0].col[0] : [255, 0, 0]} setColor={setColor} onReload={getJsonValues}/>
             </div>
             <div>
                 <EffectPicker effect={effect} source={effectSource} onPick={onChangeEffect} />
