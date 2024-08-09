@@ -21,6 +21,9 @@ export const LedControl = ({name, address}) => {
         Get(address + "/json", (res) => {
             console.log(res);
             setValue(res);
+            for (let i = 0; i < res.effects.length; i++) {
+                res.effects[i] = res.effects[i].split('@')[0];
+            }
             setEffectSource(res.effects);
             if(res.state !== undefined){
                 if(res.state.seg !== undefined) setEffect(res.state.seg[0].fx);
