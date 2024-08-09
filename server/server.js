@@ -104,20 +104,22 @@ var SpotifyWebApi = require('spotify-web-api-node');
 
 var scopes = [
     'streaming',
+    'app-remote-control',
     'user-read-email',
     'user-read-private',
     'user-library-read',
     'user-library-modify',
     'user-read-playback-state',
     'user-modify-playback-state',
+    'user-read-currently-playing',
     'playlist-read-private',
     'playlist-read-collaborative',
     'playlist-modify-private',
     'playlist-modify-public'
   ],
     redirectUri = 'http://localhost:8080/callback',
-    clientId = '93f99cd3786048ae99ae5cd292283605',
-    clientSecret = '58f52f4a09434c5d955f1ea7bbe6fafc',
+    clientId = '05ea3c29182e4a3884da1bad303a7f54', //'93f99cd3786048ae99ae5cd292283605', //
+    clientSecret = '24f75783f0f34538a8683874535d5c52',//'58f52f4a09434c5d955f1ea7bbe6fafc',
     state = generateRandomString(16),
     showDialog = false,
     responseType = 'token';
