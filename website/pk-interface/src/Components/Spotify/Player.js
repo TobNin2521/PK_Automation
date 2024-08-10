@@ -76,6 +76,9 @@ export const Player = ({actTrack, trackFinished, onStart}) => {
                                 if(state !== null) {
                                     setTrackProgress(state.position / state.duration);
                                     if(currentTrack === null) setCurrentTrack(state.track_window.current_track);
+                                    if (state.paused === true && playing === true) {
+                                        player.current.resume();
+                                    }
                                 }
                             });
                         }, 100)
