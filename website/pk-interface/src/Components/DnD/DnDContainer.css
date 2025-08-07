@@ -1,0 +1,22 @@
+.dnd-container {
+    color: #fff;
+    padding: .5em;
+    overflow-x: hidden;
+}
+.led-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+}
+.pl-group-header {
+    font-size: 1.5em;
+    font-weight: 600;
+}
+.sub-group-container {
+    display: flex;
+    flex-wrap: wrap;
+
+}
+.pl-sub-group {
+    cursor: pointer;
+}

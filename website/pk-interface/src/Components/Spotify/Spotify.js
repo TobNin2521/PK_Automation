@@ -13,7 +13,7 @@ export const Spotify = () => {
     setTimeout(() => {
       getTokens();
       checkForPlaylist();
-    }, 2000);
+    }, 2000);    
   }, []);
 
   const getTokens = () => {
@@ -21,6 +21,7 @@ export const Spotify = () => {
     window.token = res.token;
     setSpotifyInitialized(true);
   };
+
 
   const checkForPlaylist = () => {
     let pl = localStorage.getItem("pk-playlist");

@@ -142,24 +142,43 @@ app.all('*', function(req, res, next) {
     res.header('Access-Control-Allow-Origin', '*');
     res.header('Access-Control-Allow-Methods', 'PUT, GET, POST, DELETE, OPTIONS');
     res.header('Access-Control-Allow-Headers', 'Content-Type');
+    res.header('Content-Security-Policy', 'frame-ancestors http://localhost:8080 http://localhost:8080/dnd http://localhost:3000');
+    /*
+    if (['/login', '/callback', '/refresh', '/relay/status', '/relay'].includes(req.originalUrl)) {
+        console.log("Redirect next()");
+    }
+    else {
+        if (__deployment) {
+            res.sendFile(path.join(__dirname + "/public/dev/dist/build/index.html"));
+        }
+        else {
+            res.sendFile(path.join(__dirname, "../website/pk-interface/build/index.html"));
+        }
+    }
+    */
     next();
+    //next();
 });
+let spotifyInitialized = false;
 
 app.get("/login", function(req, res) {
+    console.log('Spotify Login');
     res.header("Access-Control-Allow-Origin", "*");
     res.header('Access-Control-Allow-Methods', 'PUT, GET, POST, DELETE, OPTIONS');
     res.header('Access-Control-Allow-Headers', 'Content-Type');
-    res.header('Content-Security-Policy', 'frame-ancestors http://localhost:8080');
+    res.header('Content-Security-Policy', 'frame-ancestors http://localhost:8080 http://localhost:8080/dnd http://localhost:3000');
     res.redirect(authorizeURL);
 });
 
 app.get("/callback", function (req, res) {
+    console.log('Spotify Callback');
     res.header("Access-Control-Allow-Origin", "*");
     let code = req.query.code;
     spotifyApi.authorizationCodeGrant(code).then(
         function(data) {
           spotifyApi.setAccessToken(data.body['access_token']);
           spotifyApi.setRefreshToken(data.body['refresh_token']);
+          spotifyInitialized = true;
           res.send({status: "success", token: data.body['access_token'], refresh_token: data.body['refresh_token']});
         },
         function(err) {
@@ -169,23 +188,113 @@ app.get("/callback", function (req, res) {
     );
 });
 
-app.get("/refresh", function(req, res) {
+let playlist = "";
+let tracks = [];
+let userTracks = [];
+
+const ShuffleArray = (array) => {
+    if(array === undefined) return [];
+    let currentIndex = array.length, randomIndex;
+    while (currentIndex !== 0) {
+        randomIndex = Math.floor(Math.random() * currentIndex);
+        currentIndex--;
+        [array[currentIndex], array[randomIndex]] = [
+            array[randomIndex], array[currentIndex]];
+    }
+    return array;
+}
+
+
+app.get("/spotify/playlist/tracks/add", function (req, res) {
     res.header("Access-Control-Allow-Origin", "*");
-    spotifyApi.refreshAccessToken().then(
-        function(data) {
-          console.log('The access token has been refreshed!');      
-          spotifyApi.setAccessToken(data.body['access_token']);
-          res.send({status: "success", token: data.body['access_token'], refresh_token: data.body['refresh_token']});
-        },
-        function(err) {
-          console.log('Could not refresh access token', err);
-          res.send({status: "error"});
+    if (spotifyInitialized === false) res.send({ status: "error" });
+    else {
+        let id = req.query.id;
+        if (id !== undefined && id !== null && id !== "") {
+            spotifyApi.getTrack(id, {
+                fields: 'items'
+            }).then((data) => {
+                userTracks = [...userTracks, data.body.items];
+                res.send(tracks);
+            });
         }
-    );
+        else {
+            res.send({ status: "error" });
+        }
+    }
+});
+app.get("/spotify/playlist/tracks", function (req, res) {
+    res.header("Access-Control-Allow-Origin", "*");
+    res.send([...userTracks, ...tracks]);
+});
+app.get("/spotify/playlist/set", function (req, res) {
+    res.header("Access-Control-Allow-Origin", "*");
+    if (spotifyInitialized === false) res.send({ status: "error" });
+    else {
+        let id = req.query.id;
+        userTracks = [];
+        if (id !== undefined && id !== null && id !== "" && id !== playlist) {
+            console.log("Set Playlist ", id);
+            playlist = id;
+            spotifyApi.getPlaylistTracks(id, {
+                fields: 'items'
+            }).then((data) => {
+                if (data.body.items !== undefined && data.body.items.length > 0) {
+                    console.log("Get Playlist Tracks", data.body.items.length);
+                    tracks = ShuffleArray(data.body.items);
+                    res.send(tracks);
+                }
+                else {
+                    spotifyApi.getPlaylist(id)
+                        .then(function (data) {
+                            console.log("Get Playlist Tracks", data.body.tracks.length);
+                            tracks = ShuffleArray(data.body.tracks);
+                            res.send(tracks);
+                    }, function (err) {
+                        console.log('Something went wrong!', err);
+                    });
+                }
+            });
+        }
+        else {
+            res.send({ status: "error" });
+        }
+    }
 });
 
+app.get("/spotify/tracks/next", function (req, res) {
+    res.header("Access-Control-Allow-Origin", "*");
+    console.log("Get next track", tracks.length);
+    if(userTracks.length > 0) {
+        res.send(userTracks.shift());
+    }
+    else {
+        let t = tracks.shift();
+        tracks.push(t);
+        res.send(tracks[0]);
+    }
+});
 
-const allowedOrigins = ['www.example1.com', 'www.example2.com', 'http://localhost:3000', 'http://localhost:8080', "http://192.168.56.1:3000", "http://192.168.56.1:8080"];
+app.get("/refresh", function (req, res) {
+    console.log('Spotify Refresh');
+    res.header("Access-Control-Allow-Origin", "*");
+    if (spotifyInitialized === false) res.send({ status: "error" });
+    else {
+        spotifyApi.refreshAccessToken().then(
+            function(data) {
+            console.log('The access token has been refreshed!');      
+            spotifyApi.setAccessToken(data.body['access_token']);
+            res.send({status: "success", token: data.body['access_token'], refresh_token: data.body['refresh_token']});
+            },
+            function(err) {
+            console.log('Could not refresh access token', err);
+            res.send({status: "error"});
+            }
+        );
+    }
+});
+
+const allowedOrigins = ['www.example1.com', 'www.example2.com', 'http://localhost:3000', 'http://localhost:8080', 'http://localhost:8080/dnd', "http://192.168.56.1:3000", "http://192.168.56.1:8080"];
 app.use(cors({
     origin: function (origin, callback) {
         if (!origin) {

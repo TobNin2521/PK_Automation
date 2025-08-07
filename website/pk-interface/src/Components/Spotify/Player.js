@@ -59,6 +59,7 @@ export const Player = ({actTrack, trackFinished, onStart}) => {
     };
 
     useEffect(() => {     
+        debugger;
         if(actTrack !== undefined && actTrack !== null && actTrack !== "" &&
             window.token !== undefined && window.token !== null && window.token !== "" && playing === true) {
             fetch(`https://api.spotify.com/v1/me/player/play?device_id=${deviceId}`, {

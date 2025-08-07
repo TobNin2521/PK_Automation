@@ -4,6 +4,9 @@ import { Post } from '../Logik/Network';
 import './App.css';
 import { Automation } from './Automation/Automation';
 import { Spotify } from './Spotify/Spotify';
+import ReactDOM from "react-dom/client";
+import { DnDContainer } from './DnD/DnDContainer';
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 export const App = () => {
   const [screenSaverTimeout, setScreenSaverTimeout] = useState(5);
@@ -26,15 +29,17 @@ export const App = () => {
   };
 
   return (
-    <div className="App" onClick={resetScrennsaver}>
-      <div className='left-panel'>
-        <Automation />
-      </div>
-      <div className='right-panel'>
-        <Spotify />
-      </div>
-      {toggleScreenSaver === true ? <div className='screen-saver' onClick={() => resetScrennsaver()}></div> : null}   
-    </div>
+    window.innerWidth > 1400 === false ? (
+          <div className="App" onClick={resetScrennsaver}>
+            <div className='left-panel'>
+              <Automation />
+            </div>
+            <div className='right-panel'>
+              <Spotify />
+            </div>
+            {toggleScreenSaver === true ? <div className='screen-saver' onClick={() => resetScrennsaver()}></div> : null}
+          </div> 
+    ) : <DnDContainer />
   );
 }
  
