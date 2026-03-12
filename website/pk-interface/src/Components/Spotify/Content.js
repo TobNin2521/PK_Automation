@@ -93,13 +93,13 @@ export const Content = ({playlistId, showSettings}) => {
         if(userTracks.length > 0) {
             let uTracks = [...userTracks];
             let currTrack = uTracks.shift();
-            setCurrentTrackId(currTrack.track.id);
+            setCurrentTrackId(currTrack.item.id);
             setUserTracks(uTracks);
         }
         else {
             let pTracks = [...plTracks];
             let currTrack = pTracks.shift();
-            setCurrentTrackId(currTrack.track.id);
+            setCurrentTrackId(currTrack.item.id);
             pTracks.push(currTrack);
             setPlTracks(pTracks);
         }
@@ -112,14 +112,14 @@ export const Content = ({playlistId, showSettings}) => {
                 <DndProvider backend={HTML5Backend}>
                     <div className={userTracks.length > 0 ? 'user-queue' : 'user-queue queue-hidden'}>
                         {userTracks.map((item, index) => {
-                            return renderUserTrack(item.track, index);
+                            return renderUserTrack(item.item, index);
                         })}
                     </div>
                 </DndProvider>
                 <DndProvider backend={HTML5Backend}>
                     <div className='playlist-queue'>
                         {plTracks.map((item, index) => {
-                            return renderPlTrack(item.track, index);
+                            return renderPlTrack(item.item, index);
                         })}
                     </div>
                 </DndProvider>

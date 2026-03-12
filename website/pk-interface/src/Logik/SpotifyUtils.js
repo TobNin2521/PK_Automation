@@ -9,14 +9,14 @@ const GetSearch = async (token, params) => {
     });
 };
 const GetPlaylist = async (token, id) => {
-    return await axios.get("https://api.spotify.com/v1/playlists/" + id, {
+    return await axios.get("https://api.spotify.com/v1/playlists/" + id, {// + "?fields=items(items(item.id,item.name,item.album(images),item.artists(name))),name,images(url)"
         headers: {
             Authorization: `Bearer ${token}`
         }
     });
 };
 const GetPlaylistTracks = async (token, id, url) => {
-    let u = url !== undefined ? url : ("https://api.spotify.com/v1/playlists/" + id + "/tracks");
+    let u = url !== undefined ? url : ("https://api.spotify.com/v1/playlists/" + id + "/items");
     return await axios.get(u, {
         headers: {
             Authorization: `Bearer ${token}`

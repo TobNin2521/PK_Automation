@@ -17,12 +17,14 @@ export const Player = ({actTrack, trackFinished, onStart}) => {
 
     useEffect(() => {
         if(window.token !== undefined && window.token !== null && window.token !== "" && playerInitialized === false) {
+            console.log("useEffect playerInitialized");
             setPlayerInitialized(true);
             const script = document.createElement("script");
             script.src = "https://sdk.scdn.co/spotify-player.js";
             script.async = true;        
             document.body.appendChild(script);
             window.onSpotifyWebPlaybackSDKReady = () => {
+                console.log("window.onSpotifyWebPlaybackSDKReady callback");
                 player.current = new window.Spotify.Player({
                     name: 'PK Spotify Player',
                     getOAuthToken: getAuthTokenCallback,
@@ -52,9 +54,9 @@ export const Player = ({actTrack, trackFinished, onStart}) => {
     const getAuthTokenCallback = (callback) => {
         console.log("New Token");
         Get(ADDRESS + "/refresh", (res) => {
-          console.log("Refreshed token: " + res.token);
-          window.token = res.token;
-          callback(res.token);
+          console.log("Refreshed token: " + res.access_token);
+          window.token = res.access_token;
+          callback(res.access_token);
         });
     };
 
@@ -100,6 +102,7 @@ export const Player = ({actTrack, trackFinished, onStart}) => {
     }, [trackProgress]);
 
     const playerReady = ({device_id}) => {
+        console.log("Player ready!");
         setDeviceId(device_id);
         setShowPlayer(true);
     };

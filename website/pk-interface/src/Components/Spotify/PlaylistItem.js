@@ -10,7 +10,7 @@ export const PlaylistItem = ({playlist, onClick}) => {
                     {playlist.name}                
                 </div>
                 <div className='playlist-tracks'>
-                    Tracks: {playlist.tracks.total}
+                    Tracks: {playlist.items ? playlist.items.total : 0}
                 </div>
             </div>
         ) : null

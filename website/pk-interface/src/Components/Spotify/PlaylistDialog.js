@@ -16,7 +16,7 @@ export const PlaylistDialog = ({visible, playlistId, onHide, setPlaylistId}) => 
             GetSearch(window.token, {
                 q: searchVal,
                 type: "playlist"
-            }).then(res => setPlaylists(res.data.playlists.items));
+            }).then(res => setPlaylists(res.data.playlists.items.filter(f => f && f.public === true)));
         }
     }, [searchVal]);
 
@@ -55,7 +55,7 @@ export const PlaylistDialog = ({visible, playlistId, onHide, setPlaylistId}) => 
                             <div className='curr-playlist-info'>
                                 <div className='curr-playlist-name'>{currPlaylist.name}</div>
                                 <div className='curr-playlist-owner'>{currPlaylist.owner.display_name}</div>
-                                <div className='curr-playlist-tracks'>Tracks: {currPlaylist.tracks.total}</div>
+                                <div className='curr-playlist-tracks'>Tracks: {currPlaylist.items.total}</div>
                             </div>
                         </div>
                     </div>
