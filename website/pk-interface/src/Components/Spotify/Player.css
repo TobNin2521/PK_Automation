@@ -1,0 +1,149 @@
+.player-container {
+    flex: 0 0 80px;
+    height: 80px;
+    margin: 0 12px 12px;
+    background: rgba(0, 0, 0, .32);
+    border: 1px solid var(--panel-border);
+    border-radius: 18px;
+    color: var(--text);
+}
+/* Three fixed columns: the controls stay centered even while the current track is not shown yet */
+.player {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 230px minmax(0, 1fr);
+    align-items: center;
+    height: 100%;
+    padding: 0 14px;
+    gap: 12px;
+}
+.current-track {
+    grid-column: 1;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+.current-track img {
+    flex: 0 0 auto;
+    height: 56px;
+    width: 56px;
+    object-fit: cover;
+    border-radius: 12px;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, .5);
+}
+.current-info {
+    min-width: 0;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+}
+.current-name {
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.current-artist {
+    font-size: .85em;
+    color: var(--muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.player-controls {
+    grid-column: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 7px;
+}
+/* The duotone icon becomes a filled accent button */
+.play-button > svg {
+    display: block;
+    height: 48px;
+    border-radius: 50%;
+    box-shadow: 0 0 20px var(--accent-glow);
+}
+.play-button .fa-secondary {
+    fill: var(--accent);
+}
+.play-button .fa-primary {
+    fill: #04200f;
+}
+.player-track {
+    width: 100%;
+    height: 8px;
+    border-radius: 4px;
+    overflow: hidden;
+    background-color: var(--track);
+}
+.player-track-fill {
+    background: linear-gradient(90deg, #17b455, var(--accent));
+    box-shadow: 0 0 10px var(--accent-glow);
+    border-radius: 4px;
+    height: 8px;
+    width: 0%;
+    transition: width 100ms;
+}
+.volume-slider {
+    grid-column: 3;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 10px;
+}
+.volume-slider > svg {
+    flex: 0 0 auto;
+    height: 26px;
+}
+.volume-slider .fa-primary {
+    fill: var(--muted);
+}
+.volume-slider .fa-secondary {
+    fill: var(--muted);
+    opacity: .6;
+}
+.volume-slider > input[type="range"] {
+    width: 100px;
+}
+
+/* Sliders (volume, brightness) with a large thumb for touch. --fill is set by the component
+   so the part up to the thumb is colored */
+input[type="range"]:not(.color-slider) {
+    -webkit-appearance: none;
+    appearance: none;
+    background: transparent;
+    cursor: pointer;
+    height: 32px;
+    margin: 0;
+}
+input[type="range"]:not(.color-slider)::-webkit-slider-runnable-track {
+    background: linear-gradient(90deg, var(--accent) var(--fill, 0%), var(--track) var(--fill, 0%));
+    height: 8px;
+    border-radius: 4px;
+}
+input[type="range"]:not(.color-slider)::-moz-range-track {
+    background: linear-gradient(90deg, var(--accent) var(--fill, 0%), var(--track) var(--fill, 0%));
+    height: 8px;
+    border-radius: 4px;
+}
+input[type="range"]:not(.color-slider)::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    margin-top: -12px; /* Centers thumb on the track */
+    background-color: #fff;
+    height: 32px;
+    width: 32px;
+    border: none;
+    border-radius: 50%;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, .55);
+}
+input[type="range"]:not(.color-slider)::-moz-range-thumb {
+    background-color: #fff;
+    height: 32px;
+    width: 32px;
+    border: none;
+    border-radius: 50%;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, .55);
+}

@@ -1,0 +1,112 @@
+.effect-button {
+    height: 2.75em;
+    padding: 0 .75em;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: .5em;
+    background-color: var(--card);
+    border: 1px solid var(--panel-border);
+    border-radius: 12px;
+    cursor: pointer;
+}
+.effect-button:active {
+    background-color: var(--card-hi);
+}
+.effect-name {
+    font-size: .9em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.effect-button > svg {
+    flex: 0 0 auto;
+    height: 1.4em;
+    fill: var(--muted);
+}
+.effect-dialog {
+    display: none;
+}
+.dialog-shown {
+    display: block;
+}
+.effect-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(3, 6, 10, .78);
+    z-index: 500;
+}
+/* Centered modal, well inside the safe area of the screen */
+.effect-modal {
+    position: absolute;
+    z-index: 600;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 760px;
+    height: 480px;
+    display: flex;
+    flex-direction: column;
+    background-color: var(--surface);
+    border: 1px solid var(--panel-border);
+    border-radius: 22px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, .65);
+}
+.effect-header {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 12px 8px 22px;
+    font-size: 1.3em;
+    font-weight: 600;
+}
+.effect-close {
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--card);
+    border-radius: 50%;
+    font-size: 1.1em;
+    color: var(--muted);
+    cursor: pointer;
+}
+.effect-grid {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    padding: 6px 14px 14px;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-auto-rows: 56px;
+    gap: 10px;
+}
+.effect-grid > div {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 .5em;
+    background-color: var(--card);
+    border: 1px solid var(--panel-border);
+    border-radius: 14px;
+    text-align: center;
+    font-size: .9em;
+    font-weight: 600;
+    line-height: 1.2;
+    overflow: hidden;
+    cursor: pointer;
+}
+.effect-grid > div:active {
+    background-color: var(--card-hi);
+}
+.effect-grid > div.selected {
+    background: linear-gradient(135deg, #2ee27a, #17b455);
+    border-color: transparent;
+    color: #04200f;
+    box-shadow: 0 0 18px var(--accent-glow);
+}

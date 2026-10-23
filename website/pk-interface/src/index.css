@@ -1,0 +1,78 @@
+:root {
+  --bg: #0b0f14;
+  /* Opaque surface for things that float above other content (dialogs, keyboard) */
+  --surface: #151c24;
+  --panel: rgba(255, 255, 255, .045);
+  --panel-border: rgba(255, 255, 255, .08);
+  --card: rgba(255, 255, 255, .07);
+  --card-hi: rgba(255, 255, 255, .13);
+  --text: #eef2f6;
+  --muted: #8b97a5;
+  --accent: #22d66b;
+  --accent-dim: #157a3d;
+  --accent-glow: rgba(34, 214, 107, .35);
+  --track: rgba(255, 255, 255, .15);
+  /* The touch display has trouble near its edges, keep everything tappable inside this margin */
+  --edge: 28px;
+  --radius: 18px;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html,
+body,
+#root {
+  width: 100vw;
+  height: 100vh;
+  background-color: var(--bg);
+  overflow: hidden;
+}
+
+body {
+  margin: 0;
+  font-size: 16px;
+  color: var(--text);
+  font-family: 'Segoe UI', 'Inter', -apple-system, BlinkMacSystemFont, 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  user-select: none;
+  touch-action: manipulation;
+}
+
+input {
+  font-family: inherit;
+  user-select: text;
+}
+
+/* Pressed feedback for everything that can be tapped */
+.relay-header,
+.effect-button,
+.effect-close,
+.effect-grid > div,
+.settings-button,
+.settings-close-button,
+.playlist,
+.track-search-result,
+.play-button > svg {
+  transition: transform 120ms, background-color 120ms;
+}
+.relay-header:active,
+.effect-button:active,
+.effect-close:active,
+.effect-grid > div:active,
+.settings-button:active,
+.settings-close-button:active,
+.playlist:active,
+.track-search-result:active {
+  transform: scale(.97);
+}
+.play-button > svg:active {
+  transform: scale(.92);
+}

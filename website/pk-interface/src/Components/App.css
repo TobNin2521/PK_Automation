@@ -1,0 +1,87 @@
+.App {
+  width: 100vw;
+  height: 100vh;
+  padding: var(--edge);
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  gap: 16px;
+  overflow: hidden;
+  background:
+    radial-gradient(700px 420px at 12% -8%, rgba(34, 130, 170, .28), transparent 70%),
+    radial-gradient(760px 480px at 105% 108%, rgba(34, 214, 107, .16), transparent 70%),
+    var(--bg);
+}
+.left-panel {
+  flex: 0 0 288px;
+  min-width: 0;
+  height: 100%;
+}
+.right-panel {
+  flex: 1 1 auto;
+  min-width: 0;
+  height: 100%;
+}
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background-color: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--card-hi);
+  border-radius: 3px;
+}
+.screen-saver {
+  position: absolute;
+  background-color: #000;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 10000;
+}
+
+/* On-screen keyboard: floats inset from the screen edges, slides in from the bottom */
+.keyboard-container {
+  position: fixed;
+  left: var(--edge);
+  right: var(--edge);
+  bottom: var(--edge);
+  z-index: 9999;
+  padding: 8px;
+  border-radius: var(--radius);
+  background-color: var(--surface);
+  border: 1px solid var(--panel-border);
+  box-shadow: 0 -10px 40px rgba(0, 0, 0, .55);
+  transform: translateY(calc(100% + 60px));
+  transition: transform 250ms ease-out;
+  font-size: 20px;
+  font-family: inherit;
+  color: var(--text);
+}
+.keyboard-shown {
+  transform: translateY(0);
+}
+.hg-theme-default {
+  background-color: transparent !important;
+  padding: 0 !important;
+}
+.hg-theme-default .hg-row:not(:last-child) {
+  margin-bottom: 6px !important;
+}
+.hg-theme-default .hg-button {
+  height: 42px !important;
+  background-color: var(--card-hi) !important;
+  color: var(--text);
+  border-radius: 10px;
+  border-bottom: none;
+  box-shadow: none;
+}
+.hg-theme-default .hg-button:active {
+  background-color: var(--accent) !important;
+  color: #04200f;
+}
+.hg-button[data-skbtn='{⌨}'] {
+  max-width: 70px;
+}

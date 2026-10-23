@@ -1,0 +1,36 @@
+.content {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    color: var(--text);
+}
+.queue-container {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    padding: 0 12px;
+}
+.user-queue,
+.playlist-queue {
+    padding-bottom: 4px;
+}
+.user-queue::before,
+.playlist-queue::before {
+    display: block;
+    padding: 10px 4px 8px;
+    font-size: .72em;
+    font-weight: 700;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--muted);
+}
+.user-queue::before {
+    content: "Your queue";
+    color: var(--accent);
+}
+.playlist-queue::before {
+    content: "From playlist";
+}
+.queue-hidden {
+    display: none;
+}

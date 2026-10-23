@@ -1,0 +1,39 @@
+.led-control {
+    height: 8em;
+    padding: 0 .85em;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: .9em;
+    border-top: 1px solid rgba(255, 255, 255, .08);
+}
+/* The device can't be reached */
+.led-offline {
+    opacity: .45;
+}
+.led-wheel {
+    flex: 0 0 auto;
+}
+.led-settings {
+    flex: 1 1 auto;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: .3em;
+}
+.led-name {
+    font-size: 1.05em;
+    font-weight: 600;
+}
+.led-brightness-label {
+    margin-top: .1em;
+    font-size: .7em;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--muted);
+}
+.led-settings input[type="range"] {
+    width: 100%;
+    margin: 0;
+}
