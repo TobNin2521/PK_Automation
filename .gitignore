@@ -1,2 +1,10 @@
 
 server/node_modules/
+server/settings.json
+server/data/
+
+# Contains the GitHub token, copied to the Pi by hand
+scripts/pk-clone.sh
+
+# Profile of the browser that shows the website on the Pi
+.browser-profile/
