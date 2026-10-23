@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { GetSearch } from "../../Logik/SpotifyUtils";
+import { SearchTracks } from "../../Logik/Api";
 import './TopBar.css';
 import { KeybordComp } from "../Keyboard";
 
@@ -11,10 +11,12 @@ export const TopBar = ({addTrack, showSettings}) => {
 
     useEffect(() => {
         if(searchVal !== "") {
-            GetSearch(window.token, {
-                q: searchVal,
-                type: "track"
-            }).then(res => setSearchTracks(res.data.tracks.items));
+            // Ignore responses of outdated searches that arrive out of order
+            let cancelled = false;
+            SearchTracks(searchVal).then(items => {
+                if(!cancelled) setSearchTracks(items);
+            }).catch(err => console.log(err));
+            return () => { cancelled = true; };
         }
     }, [searchVal]);
 
@@ -51,16 +53,16 @@ export const TopBar = ({addTrack, showSettings}) => {
                 {searchTracks.map((item, index) => {
                     return (
                         <div key={index} className="track-search-result" onClick={()=>onAddTrackClick(item.id)}>
-                            <img src={item.album.images[0].url} />
+                            {item.image ? <img src={item.image} /> : null}
                             <div className="track-info">
                                 <div className="track-name">{item.name}</div>
-                                <div className="track-artist">{item.artists[0].name}</div>
+                                <div className="track-artist">{item.artist}</div>
                             </div>
                         </div>
                     );
                 })}
             </div>
-            <KeybordComp showKeyboard={showKeyboard} setKeyboardValue={setSearchVal} onKeyboardPress={keyboardPress} />
+            <KeybordComp showKeyboard={showKeyboard} value={searchVal} setKeyboardValue={setSearchVal} onKeyboardPress={keyboardPress} />
         </>
     );
 };

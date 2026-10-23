@@ -1,9 +1,10 @@
-import { useEffect, useState } from "react";
+import { Children, useEffect, useState } from "react";
 import ADDRESS, { Get, Post } from "../../Logik/Network";
 import './Relay.css';
 
 export const Relay = ({children, name, pin}) => {
-    const [status, setStatus] = useState(true);
+    // Relays start switched off on the server, so assume off until the status arrives
+    const [status, setStatus] = useState(false);
     
     useEffect(() => {
         try{
@@ -34,20 +35,20 @@ export const Relay = ({children, name, pin}) => {
     };
 
     return (
-        <div className="relay" style={{maxHeight: children !== undefined && status === true ? ((children.length * 15) + "em") : ""}}>
-            <div className="relay-header">
-                <span>{name}</span>
-                {status === true ? (
-                    <svg viewBox="0 0 576 512" onClick={switchOff}>
-                        <path className="fa-secondary" d="M192 64C86 64 0 150 0 256S86 448 192 448H384c106 0 192-86 192-192s-86-192-192-192H192zm192 96a96 96 0 1 1 0 192 96 96 0 1 1 0-192z" />
-                        <path className="fa-primary" d="M288 256a96 96 0 1 1 192 0 96 96 0 1 1 -192 0z" />
-                    </svg>
-                ) : (
-                        <svg viewBox="0 0 576 512" onClick={switchOn}>
-                        <path className="fa-secondary" d="M192 128c-70.7 0-128 57.3-128 128s57.3 128 128 128H384c70.7 0 128-57.3 128-128s-57.3-128-128-128H192zM384 64c106 0 192 86 192 192s-86 192-192 192H192C86 448 0 362 0 256S86 64 192 64H384z" />
-                        <path className="fa-primary" d="M96 256a96 96 0 1 0 192 0A96 96 0 1 0 96 256z" />
-                    </svg>
-                )}
+        // Header is 3.5em, every child (LED control) is 8em, plus a little bottom space
+        <div className={status === true ? "relay relay-on" : "relay"} style={{maxHeight: children !== undefined && status === true ? ((3.5 + Children.count(children) * 8 + 0.5) + "em") : ""}}>
+            {/* The whole header is the touch target, not only the switch */}
+            <div className="relay-header" onClick={status === true ? switchOff : switchOn}>
+                <div className="relay-icon">
+                    <svg viewBox="0 0 24 24"><path d="M9 21c0 .55.45 1 1 1h4c.55 0 1-.45 1-1v-1H9v1zm3-19C8.14 2 5 5.14 5 9c0 2.38 1.19 4.47 3 5.74V17c0 .55.45 1 1 1h6c.55 0 1-.45 1-1v-2.26c1.81-1.27 3-3.36 3-5.74 0-3.86-3.14-7-7-7z"/></svg>
+                </div>
+                <div className="relay-title">
+                    <span className="relay-name">{name}</span>
+                    <span className="relay-status">{status === true ? "On" : "Off"}</span>
+                </div>
+                <div className={status === true ? "switch switch-on" : "switch"} role="switch" aria-checked={status === true}>
+                    <div className="switch-knob"></div>
+                </div>
             </div>
             {children}
         </div>

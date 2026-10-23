@@ -1,6 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
-import SpotifyPlayer from 'react-spotify-web-playback';
-import { GetPlaylistTracks, GetTrack, ShuffleArray } from '../../Logik/SpotifyUtils';
+import { useCallback, useEffect, useState } from 'react';
 import update from 'immutability-helper'
 import { TopBar } from './TopBar';
 import { Track } from './Track';
@@ -8,39 +6,24 @@ import { DndProvider } from 'react-dnd'
 import { HTML5Backend } from 'react-dnd-html5-backend'
 import './Content.css';
 import { Player } from './Player';
+import { AddTrack, MoveTrack } from '../../Logik/Api';
 
-export const Content = ({playlistId, showSettings}) => {
-    const [plTracks, setPlTracks] = useState([]);
-    const [userTracks, setUserTracks] = useState([]);
-    const [playing, setPlaying] = useState(false);
-    const [currentTrackId, setCurrentTrackId] = useState("");
+// Shows the queues of the server. Reordering is applied here right away while dragging and
+// sent to the server once the track is dropped.
+export const Content = ({state, showSettings}) => {
+    const [plTracks, setPlTracks] = useState(state.playlistQueue);
+    const [userTracks, setUserTracks] = useState(state.userQueue);
 
-    useEffect(() => {        
-        if(playlistId !== null && playlistId !== "") {
-            getPlTracks();           
-        }
-    }, [playlistId]);
+    useEffect(() => {
+        setPlTracks(state.playlistQueue);
+    }, [state.playlistQueue]);
 
-    let _tracks = [];
-    const getPlTracks = (url) => {
-        GetPlaylistTracks(window.token, playlistId, url).then(res => {
-            if(res.data.next !== null) {
-                _tracks = [..._tracks, ...res.data.items];
-                getPlTracks(res.data.next);
-            }
-            else {
-                _tracks = [..._tracks, ...res.data.items];
-                ShuffleArray(_tracks);
-                setPlTracks(_tracks);
-            }
-        });
-    };
+    useEffect(() => {
+        setUserTracks(state.userQueue);
+    }, [state.userQueue]);
 
     const addUserTrack = (id) => {
-        GetTrack(window.token, id).then(res => {
-            let track = {track : res.data};
-            setUserTracks([...userTracks, track]);
-        })
+        AddTrack(id).catch(err => console.log(err));
     };
 
     const movePlTrack = useCallback((dragIndex, hoverIndex) => {
@@ -62,6 +45,7 @@ export const Content = ({playlistId, showSettings}) => {
           type={"playlist"}
           index={index}
           moveTrack={movePlTrack}
+          onDrop={(from, to) => MoveTrack("playlist", from, to).catch(err => console.log(err))}
         />
       )
     }, []);
@@ -85,59 +69,31 @@ export const Content = ({playlistId, showSettings}) => {
           type={"user"}
           index={index}
           moveTrack={moveUserTrack}
+          onDrop={(from, to) => MoveTrack("user", from, to).catch(err => console.log(err))}
         />
       )
     }, []);
 
-    const trackFinished = () => {
-        if(userTracks.length > 0) {
-            let uTracks = [...userTracks];
-            let currTrack = uTracks.shift();
-            setCurrentTrackId(currTrack.item.id);
-            setUserTracks(uTracks);
-        }
-        else {
-            let pTracks = [...plTracks];
-            let currTrack = pTracks.shift();
-            setCurrentTrackId(currTrack.item.id);
-            pTracks.push(currTrack);
-            setPlTracks(pTracks);
-        }
-    };
-
     return (
         <div className="content">
             <TopBar addTrack={addUserTrack} showSettings={showSettings} />
-            <div className='queue-container'>                
+            <div className='queue-container'>
                 <DndProvider backend={HTML5Backend}>
                     <div className={userTracks.length > 0 ? 'user-queue' : 'user-queue queue-hidden'}>
                         {userTracks.map((item, index) => {
-                            return renderUserTrack(item.item, index);
+                            return renderUserTrack(item, index);
                         })}
                     </div>
                 </DndProvider>
                 <DndProvider backend={HTML5Backend}>
                     <div className='playlist-queue'>
                         {plTracks.map((item, index) => {
-                            return renderPlTrack(item.item, index);
+                            return renderPlTrack(item, index);
                         })}
                     </div>
                 </DndProvider>
             </div>
-            <Player actTrack={currentTrackId} trackFinished={trackFinished} onStart={trackFinished} />
+            <Player />
         </div>
     );
 };
-
-/*
-
-            <SpotifyPlayer ref={playerRef} token={token} uris={currTrackUri} hideAttribution={true} play={playing} initialVolume={.5} callback={handleCallback} styles={{                
-                bgColor: '#333',
-                color: '#469c00',
-                sliderColor: '#469c00',
-                sliderTrackColor: '#555',
-                sliderHandleColor: '#469c00',
-                trackArtistColor: '#ddd',
-                trackNameColor: '#ccc',
-            }}/>
-*/

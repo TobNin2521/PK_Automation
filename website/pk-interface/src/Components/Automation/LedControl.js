@@ -1,70 +1,96 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { ColorPicker } from './ColorPicker/ColorPicker';
 import './LedControl.css';
-import { Get, Post } from '../../Logik/Network';
+import { GetLed, SetLed } from '../../Logik/Api';
+import { Subscribe } from '../../Logik/Server';
 import { EffectPicker } from './EffectPicker';
-import { ColorPickerV2 } from './ColorPicker/ColorPickerV2';
 
-export const LedControl = ({name, address}) => {
-    const [value, setValue] = useState(null);
-    const [effectSource, setEffectSource] = useState(["Effect 1", "Effect 2", "Effect 3", "Effect 4", "Effect 5", "Effect 6", "Effect 7", "Effect 8", "Effect 9", "Effect 1", "Effect 2", "Effect 3", "Effect 4", "Effect 5", "Effect 6", "Effect 7", "Effect 8", "Effect 9", "Effect 1", "Effect 2", "Effect 3", "Effect 4", "Effect 5", "Effect 6", "Effect 7", "Effect 8", "Effect 9"]);
+// Stable references, a new array on every render would re-trigger the ColorPicker effect
+const DEFAULT_COLOR = [255, 0, 0];
+const NO_EFFECTS = [];
+
+// The LED device itself is handled by the server (server/leds.js), id is the id of the device there
+export const LedControl = ({id, name}) => {
+    const [led, setLed] = useState(null);
+    const [offline, setOffline] = useState(false);
     const [effect, setEffect] = useState(0);
     const [brightness, setBrightness] = useState(-1);
+    // Sliders send a lot of changes: one request at a time, the changes in the meantime are merged
+    const inflight = useRef(false);
+    const pending = useRef(null);
 
     useEffect(() => {
-        if(address !== undefined && address !== null && address !== "") {
-            getJsonValues();
-        }        
-    }, [address]);
+        loadLed();
+        // Changes made by other devices
+        return Subscribe("led", (state) => {
+            if(state.id === id && inflight.current === false && pending.current === null) setLed(state);
+        });
+    }, [id]);
 
-    const getJsonValues = () => {
-        Get(address + "/json", (res) => {
-            console.log(res);
-            setValue(res);
-            for (let i = 0; i < res.effects.length; i++) {
-                res.effects[i] = res.effects[i].split('@')[0];
-            }
-            setEffectSource(res.effects);
-            if(res.state !== undefined){
-                if(res.state.seg !== undefined) setEffect(res.state.seg[0].fx);
-                if(res.state.bri !== undefined) setBrightness(res.state.bri);
-            }            
+    useEffect(() => {
+        if(led !== null) {
+            setEffect(led.effect);
+            setBrightness(led.brightness);
+        }
+    }, [led]);
+
+    const loadLed = () => {
+        GetLed(id).then((state) => {
+            setOffline(false);
+            setLed(state);
+        }).catch((err) => {
+            console.log(err);
+            setOffline(true);
+        });
+    };
+
+    const sendChange = (change) => {
+        pending.current = {...(pending.current || {}), ...change};
+        if(inflight.current === false) flush();
+    };
+
+    const flush = () => {
+        const change = pending.current;
+        pending.current = null;
+        inflight.current = true;
+        SetLed(id, change).then((state) => {
+            setOffline(false);
+            // Not while the user is still moving a slider, that would snap it back
+            if(pending.current === null) setLed(state);
+        }).catch((err) => {
+            console.log(err);
+            setOffline(true);
+        }).finally(() => {
+            inflight.current = false;
+            if(pending.current !== null) flush();
         });
     };
 
     const setColor = (col) => {
-        Post(address + "/json/state", {"seg": [{ "col": [col] }] }, (res) => {
-            getJsonValues();
-        });
+        sendChange({ color: col });
     };
 
     const onChangeEffect = (val) => {
         setEffect(Number(val));
-        Post(address + "/json/state", { "seg": [{ "fx": Number(val) }] }, (res) => {
-            getJsonValues();
-        });
+        sendChange({ effect: Number(val) });
     };
 
     const onChangeBrightness = (e) => {
         setBrightness(Number(e.target.value));
-        Post(address + "/json/state", { "bri": Number(e.target.value) }, (res) => {
-            getJsonValues();
-        });
+        sendChange({ brightness: Number(e.target.value) });
     };
 
     return (
-        <div className="led-control">
-            <div>
-                <span>{name}</span>
-                <ColorPicker name={name} color={value !== null && value.state !== undefined && value.state !== null && value.state.seg !== undefined && value.state.seg !== null ? value.state.seg[0].col[0] : [255, 0, 0]} setColor={setColor} onReload={getJsonValues}/>
+        <div className={offline === true ? "led-control led-offline" : "led-control"}>
+            <div className="led-wheel">
+                <ColorPicker name={name} color={led !== null ? led.color : DEFAULT_COLOR} setColor={setColor} onReload={loadLed}/>
             </div>
-            <div>
-                <EffectPicker effect={effect} source={effectSource} onPick={onChangeEffect} />
-                <input type='range' min={1} max={255} value={brightness} onChange={onChangeBrightness} />
+            <div className="led-settings">
+                <span className="led-name">{name}</span>
+                <EffectPicker effect={effect} source={led !== null ? led.effects : NO_EFFECTS} onPick={onChangeEffect} />
+                <span className="led-brightness-label">Brightness</span>
+                <input type='range' min={1} max={255} value={brightness} style={{"--fill": (Math.max(brightness - 1, 0) / 254 * 100) + "%"}} onChange={onChangeBrightness} />
             </div>
         </div>
     )
 };
-/*
-                <ColorPickerV2 color={value !== null ? value.state.seg[0].col[0] : [255, 0, 0]} setColor={setColor} />
- */

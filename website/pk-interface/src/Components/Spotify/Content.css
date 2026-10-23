@@ -1,23 +1,36 @@
+.content {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    color: var(--text);
+}
 .queue-container {
-    max-height: calc(600px - 10em);
+    flex: 1 1 auto;
+    min-height: 0;
     overflow-y: auto;
-    background-color: #444;
-    color: #ddd;
+    padding: 0 12px;
 }
-.user-queue {
-    transform: scaleY(1);
-    transition: all 500ms ease-in-out;
-    border-bottom: 1px solid #666;
+.user-queue,
+.playlist-queue {
+    padding-bottom: 4px;
 }
-.queue-hidden{
-    transform: scaleY(0);
-    transition: all 500ms ease-in-out;
+.user-queue::before,
+.playlist-queue::before {
+    display: block;
+    padding: 10px 4px 8px;
+    font-size: .72em;
+    font-weight: 700;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--muted);
 }
-button[title='Devices'],
-button[title='Previous'],
-button[title='Next'] {
+.user-queue::before {
+    content: "Your queue";
+    color: var(--accent);
+}
+.playlist-queue::before {
+    content: "From playlist";
+}
+.queue-hidden {
     display: none;
-}
-.slider__track > div > span {
-    display: none !important;
 }

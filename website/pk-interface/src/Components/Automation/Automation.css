@@ -1,7 +1,13 @@
 .automation {
-    background-color: #444444;
     height: 100%;
-    border-right: 2px solid #333;
-    color: #ddd;
+    padding: 12px;
+    background: linear-gradient(180deg, rgba(255, 255, 255, .065), rgba(255, 255, 255, .03));
+    border: 1px solid var(--panel-border);
+    border-radius: var(--radius);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, .35);
+    color: var(--text);
     overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
 }

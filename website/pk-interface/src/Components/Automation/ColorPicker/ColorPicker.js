@@ -9,42 +9,18 @@ export const ColorPicker = ({name, style, color, setColor, onReload}) => {
         setAngle(getAngleFromColor(color));
     }, [color]);
 
+    // The picker only knows hues, any color (also one that was set by another device) is shown with its hue
     const getAngleFromColor = (color) => {
-        let red = color[0], green = color[1], blue = color[2];
-        if (red === 255) {
-            if (green === 0 && blue === 0) return 0;
-            if (blue === 0) {
-                //0-60
-                return (green / 255) * 60;
-            }
-            if (green === 0) {
-                //300-360
-                return (60 - ((blue / 255) * 60)) + 300;
-            }
-        }
-        if (green === 255) {
-            if (red === 0 && blue === 0) return 120;
-            if (blue === 0) {
-                //180-240
-                return (60 - ((red / 255) * 60)) + 60;
-            }
-            if (red === 0) {
-                //240-300
-                return ((blue / 255) * 60) + 120;
-            }
-        }
-        if (blue === 255) {
-            if (red === 0 && green === 0) return 240;
-            if (green === 0) {
-                //120-180
-                return ((red / 255) * 60) + 240;
-            }
-            if (red === 0) {
-                //60-120
-                return (60 - ((green / 255) * 60)) + 180;
-            }
-        }
-        return 45;
+        const r = color[0] / 255, g = color[1] / 255, b = color[2] / 255;
+        const max = Math.max(r, g, b), delta = max - Math.min(r, g, b);
+        // White, grey and black have no hue
+        if (delta === 0) return 0;
+        let hue;
+        if (max === r) hue = ((g - b) / delta) % 6;
+        else if (max === g) hue = (b - r) / delta + 2;
+        else hue = (r - g) / delta + 4;
+        hue *= 60;
+        return hue < 0 ? hue + 360 : hue;
     };
 
     const getColorFromAngle = (angle) => {
@@ -87,7 +63,8 @@ export const ColorPicker = ({name, style, color, setColor, onReload}) => {
             blue = (blue / 60) * 255
             red = 255;
         }
-        return [red, green, blue];
+        // WLED expects integer channel values
+        return [Math.round(red), Math.round(green), Math.round(blue)];
     };
 
     const onPalleteRotate = (e) => {
@@ -137,7 +114,7 @@ export const ColorPicker = ({name, style, color, setColor, onReload}) => {
     return (
         <div id={name} className="color-picker" style={style}>
             <div className="color-pallete">
-                <div className='color-selector-container' style={{transform: 'rotate(' + angle + 'deg)'}} onTouchEnd={() => setDragging(false)} onMouseLeave={() => setDragging(false)} onMouseMove={onPalleteRotate} onTouchMove={onPalleteRotate} onClick={(e) => onPalleteClick(e)}>
+                <div className='color-selector-container' style={{transform: 'rotate(' + angle + 'deg)'}} onMouseDown={() => setDragging(true)} onTouchStart={() => setDragging(true)} onMouseUp={() => setDragging(false)} onTouchEnd={() => setDragging(false)} onMouseLeave={() => setDragging(false)} onMouseMove={onPalleteRotate} onTouchMove={onPalleteRotate} onClick={(e) => onPalleteClick(e)}>
                     <div className='color-selector' onMouseDown={() => setDragging(true)} onMouseUp={() => setDragging(false)} onTouchEnd={() => setDragging(false)} onTouchStart={() => setDragging(true)}></div>
                 </div>
             </div>            

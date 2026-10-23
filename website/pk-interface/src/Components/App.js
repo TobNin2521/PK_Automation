@@ -11,7 +11,7 @@ export const App = () => {
   
   useInterval(() => {
       setScreenSaverTimeout((prevVal) => prevVal - 1);
-  }, 5 * 60 * 1000);
+  }, 60 * 1000); // timeout counts minutes
 
   useEffect(() => {
     if(screenSaverTimeout <= 0) {

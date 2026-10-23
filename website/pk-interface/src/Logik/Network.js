@@ -14,7 +14,9 @@ function Post(url, data, cb) {
         headers: {"Content-Type": "application/json"}
     })
     .then(response => response.json())
-    .then(data => cb(data)).catch((err) => console.log(err));
+    .then(data => {
+        if(cb !== undefined && cb !== null) cb(data);
+    }).catch((err) => console.log(err));
 };
 
 export {Get, Post};

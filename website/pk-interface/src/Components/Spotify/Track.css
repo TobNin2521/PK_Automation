@@ -1,39 +1,77 @@
 .track {
     display: flex;
-    height: 4em;
-    flex-direction: row;
-    cursor: pointer;
+    align-items: center;
+    height: 64px;
+    margin-bottom: 6px;
+    padding: 0 4px 0 8px;
+    gap: 12px;
+    background-color: var(--card);
+    border: 1px solid transparent;
+    border-radius: 14px;
 }
-.track-info-container {
-    display: flex;
-    justify-content: space-between;
-    column-gap: 20px;
-    width: 100%;
+.user-track {
+    background: linear-gradient(90deg, rgba(34, 214, 107, .16), rgba(255, 255, 255, .06) 55%);
+    border-color: rgba(34, 214, 107, .22);
 }
 .track > img {
-    height: 3.5em;
-    margin: .25em;
+    flex: 0 0 auto;
+    height: 48px;
+    width: 48px;
+    object-fit: cover;
+    border-radius: 10px;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, .4);
 }
-.track-info, .track-album-info, .track-duration-info  {
+.track-info-container {
+    flex: 1 1 auto;
+    min-width: 0;
     display: flex;
-    justify-content: center;
+    align-items: center;
+    gap: 12px;
+}
+.track .track-info {
+    flex: 1 1 auto;
+    min-width: 0;
+    display: flex;
     flex-direction: column;
-    min-width: 20em;
+    justify-content: center;
+    gap: 2px;
 }
-.track-duration-info  {
-    min-width: 5em;
+.track .track-name {
+    font-size: 1.05em;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
-.track-name {
-    font-size: 1.25em;
+.track .track-artist {
+    font-size: .82em;
+    color: var(--muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
-.track-artist {
-    font-size: .75em;
+.track-duration-info {
+    flex: 0 0 auto;
+    font-size: .85em;
+    font-variant-numeric: tabular-nums;
+    color: var(--muted);
 }
+/* Only the handle starts a drag, so the list can still be scrolled by touch */
 .track-drag {
-    height: 3em;
-    margin: .5em;
-    float: right;
+    flex: 0 0 auto;
+    width: 56px;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    touch-action: none;
+    cursor: grab;
 }
 .track-drag > svg {
-    height: 3em;
+    height: 1.25em;
+    opacity: .7;
+}
+.track-drag .fa-primary,
+.track-drag .fa-secondary {
+    fill: var(--muted);
 }

@@ -1,34 +1,28 @@
 import { useEffect, useState } from 'react';
 import './PlaylistDialog.css';
-import { GetPlaylist, GetSearch } from '../../Logik/SpotifyUtils';
+import { SearchPlaylists } from '../../Logik/Api';
 import { PlaylistItem } from './PlaylistItem';
 import { KeybordComp } from '../Keyboard';
 
-export const PlaylistDialog = ({visible, playlistId, onHide, setPlaylistId}) => {
+export const PlaylistDialog = ({visible, state, onHide, setPlaylistId}) => {
     const [searchVal, setSearchVal] = useState("");
     const [playlists, setPlaylists] = useState([]);
-    const [showCurrPlaylist, setShowCurrPlaylist] = useState(false);
-    const [currPlaylist, setCurrPlaylist] = useState(null);
     const [showKeyboard, setShowKeyboard] = useState(false);
+
+    const currPlaylist = state.playlist;
+    const showCurrPlaylist = state.playlistId !== undefined && state.playlistId !== null && state.playlistId !== "";
 
     useEffect(() => {
         if(searchVal !== "") {
-            GetSearch(window.token, {
-                q: searchVal,
-                type: "playlist"
-            }).then(res => setPlaylists(res.data.playlists.items.filter(f => f && f.public === true)));
+            // Ignore responses of outdated searches that arrive out of order
+            let cancelled = false;
+            SearchPlaylists(searchVal).then(items => {
+                if(!cancelled) setPlaylists(items);
+            }).catch(err => console.log(err));
+            return () => { cancelled = true; };
         }
     }, [searchVal]);
 
-    useEffect(() => {
-        if(playlistId !== undefined && playlistId !== null && playlistId !== "") {
-            GetPlaylist(window.token, playlistId).then(res => {
-                setCurrPlaylist(res.data);
-                setShowCurrPlaylist(playlistId !== undefined && playlistId !== null && playlistId !== "");
-            });
-        }
-    }, [playlistId]);
-    
     const keyboardPress = (key) => {
         if(key === '{⌨}') {
             setShowKeyboard(false);
@@ -37,8 +31,8 @@ export const PlaylistDialog = ({visible, playlistId, onHide, setPlaylistId}) => 
 
     return (
         <>
-            <div className={visible === true ? "playlist-dialog" : "playlist-dialog hidden"}>
-                <div style={{height: "5em", display: "flex", flexDirection: "row"}}>
+            <div className={"playlist-dialog" + (visible === true ? "" : " hidden") + (showKeyboard === true ? " kbd-open" : "")}>
+                <div className="playlist-header">
                     <input className='playlist-search' type='text' placeholder='Search' value={searchVal} onChange={(e) => setSearchVal(e.target.value)}  onFocus={() => setShowKeyboard(true)}/>
                     <div className="settings-close-button" onClick={() => {onHide(); setShowKeyboard(false); setSearchVal(""); setPlaylists([]);}}>
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
@@ -51,12 +45,18 @@ export const PlaylistDialog = ({visible, playlistId, onHide, setPlaylistId}) => 
                     <div className='curr-playlist-container'>
                         <div>Currently selected playlist:</div>
                         <div className='curr-playlist'>
-                            <img src={currPlaylist.images[0].url} />
-                            <div className='curr-playlist-info'>
-                                <div className='curr-playlist-name'>{currPlaylist.name}</div>
-                                <div className='curr-playlist-owner'>{currPlaylist.owner.display_name}</div>
-                                <div className='curr-playlist-tracks'>Tracks: {currPlaylist.items.total}</div>
-                            </div>
+                            {currPlaylist !== null ? (<>
+                                {currPlaylist.image ? <img src={currPlaylist.image} /> : null}
+                                <div className='curr-playlist-info'>
+                                    <div className='curr-playlist-name'>{currPlaylist.name}</div>
+                                    <div className='curr-playlist-owner'>{currPlaylist.owner}</div>
+                                    <div className='curr-playlist-tracks'>Tracks: {currPlaylist.total}</div>
+                                </div>
+                            </>) : (
+                                <div className='curr-playlist-info'>
+                                    <div className='curr-playlist-name'>{state.loading === true ? "Loading playlist..." : "Playlist not loaded"}</div>
+                                </div>
+                            )}
                         </div>
                     </div>
                 ) : null}
@@ -69,7 +69,7 @@ export const PlaylistDialog = ({visible, playlistId, onHide, setPlaylistId}) => 
                     })}
                 </div>
             </div>
-            <KeybordComp showKeyboard={showKeyboard} setKeyboardValue={setSearchVal} onKeyboardPress={keyboardPress} />
+            <KeybordComp showKeyboard={showKeyboard} value={searchVal} setKeyboardValue={setSearchVal} onKeyboardPress={keyboardPress} />
         </>
     );
 };

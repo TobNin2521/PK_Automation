@@ -1,22 +1,93 @@
 .relay {
-    max-height: 4em;
+    flex: 0 0 auto;
+    max-height: 3.5em;
     overflow: hidden;
-    transition: all 300ms;
-    border-bottom: 2px solid #333;
+    background-color: var(--card);
+    border: 1px solid var(--panel-border);
+    border-radius: 14px;
+    transition: max-height 300ms, background-color 300ms, border-color 300ms;
+}
+.relay-on {
+    background: linear-gradient(135deg, rgba(34, 214, 107, .2), rgba(255, 255, 255, .05) 70%);
+    border-color: rgba(34, 214, 107, .45);
 }
 .relay-header {
     display: flex;
     flex-direction: row;
     align-items: center;
-    height: 4em;
+    gap: .75em;
+    height: calc(3.5em - 2px);
+    padding: 0 .9em 0 .6em;
+    cursor: pointer;
 }
-.relay-header > svg {
-    height: 2em;
-    margin-left: auto;
-    margin-right: 3em;
+.relay-icon {
+    flex: 0 0 auto;
+    width: 2.4em;
+    height: 2.4em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    background-color: rgba(255, 255, 255, .08);
+    color: var(--muted);
+    transition: background-color 300ms, color 300ms, box-shadow 300ms;
 }
-.relay-header > span {
-    font-size: 1.5em;
+.relay-icon > svg {
+    width: 1.45em;
+    height: 1.45em;
+    fill: currentColor;
+}
+.relay-on .relay-icon {
+    background-color: var(--accent);
+    color: #04200f;
+    box-shadow: 0 0 16px var(--accent-glow);
+}
+.relay-title {
+    flex: 1 1 auto;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: .1em;
+}
+.relay-name {
+    font-size: 1.15em;
     font-weight: 600;
-    margin-left: 3em;
+    line-height: 1.1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.relay-status {
+    font-size: .75em;
+    color: var(--muted);
+}
+.relay-on .relay-status {
+    color: var(--accent);
+}
+.switch {
+    flex: 0 0 auto;
+    position: relative;
+    width: 3.25em;
+    height: 1.9em;
+    border-radius: 1em;
+    background-color: rgba(255, 255, 255, .16);
+    transition: background-color 200ms, box-shadow 200ms;
+}
+.switch-knob {
+    position: absolute;
+    top: .2em;
+    left: .2em;
+    width: 1.5em;
+    height: 1.5em;
+    border-radius: 50%;
+    background-color: #fff;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, .4);
+    transition: transform 200ms;
+}
+.switch-on {
+    background-color: var(--accent);
+    box-shadow: 0 0 14px var(--accent-glow);
+}
+.switch-on .switch-knob {
+    transform: translateX(1.35em);
 }

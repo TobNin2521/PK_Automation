@@ -1,63 +1,103 @@
 .top-bar {
-    height: 5em;
-    background-color: #333;
+    flex: 0 0 auto;
     display: flex;
     flex-direction: row;
-    
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
 }
 .track-search {
-    border: none;
+    flex: 1 1 auto;
+    min-width: 0;
+    height: 48px;
+    border: 1px solid var(--panel-border);
     outline: none;
-    border-radius: 0;
-    background-color: #444;
-    height: 2em;
-    padding: .5em;
-    margin: 1em;
-    font-size: 1em;
-    color: #ddd;
-    flex-grow: 1;
+    border-radius: 24px;
+    background: var(--card) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%238b97a5' d='M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z'/%3E%3C/svg%3E") no-repeat 16px center / 22px;
+    padding: 0 18px 0 46px;
+    font-size: 1.1em;
+    color: var(--text);
+    transition: border-color 150ms, box-shadow 150ms;
+}
+.track-search::placeholder {
+    color: var(--muted);
 }
 .track-search:focus {
-    background-color: #555;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-glow);
 }
 .settings-button {
-    height: 3em;
-    width: 3em;
-    padding: 1em;
+    flex: 0 0 48px;
+    height: 48px;
+    width: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--card);
+    border: 1px solid var(--panel-border);
+    border-radius: 50%;
     cursor: pointer;
-    flex-grow: 0;
 }
+.settings-button:active {
+    background-color: var(--card-hi);
+}
+.settings-button > svg {
+    height: 24px;
+}
+.settings-button .fa-primary {
+    fill: var(--text);
+}
+.settings-button .fa-secondary {
+    fill: var(--muted);
+}
+/* Sized so it ends above the on-screen keyboard */
 .track-search-results {
-    max-height: 20em;
-    height: 20em;
-    background-color: #444;
+    flex: 0 0 auto;
+    height: 12.5em;
+    margin: 0 12px 8px;
+    background-color: var(--surface);
+    border: 1px solid var(--panel-border);
+    border-radius: 14px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, .4);
     overflow-y: auto;
     overflow-x: hidden;
-    transition: all 500ms ease-in-out;
+    transition: height 300ms ease-in-out, margin 300ms ease-in-out;
 }
 .results-hidden {
-    height: 0em;
-    overflow-y: hidden;
-    transition: all 500ms ease-in-out;
+    height: 0;
+    margin-bottom: 0;
+    border-width: 0;
+    overflow: hidden;
 }
 .track-search-result {
-    height: 3em;
+    height: 50px;
     display: flex;
-    color: #ddd;
+    align-items: center;
+    gap: 12px;
+    padding: 0 12px;
+    border-bottom: 1px solid rgba(255, 255, 255, .06);
     cursor: pointer;
-    border-bottom: 1px solid #222;
 }
-.track-search-result:hover {
-    color: #fff;
+.track-search-result:active {
+    background-color: var(--card-hi);
 }
 .track-search-result > img {
-    height: 2.5em;
-    margin: .25em;
+    flex: 0 0 auto;
+    height: 38px;
+    width: 38px;
+    border-radius: 8px;
+    object-fit: cover;
 }
-.track-info {
-    margin-left: .5em;
-    padding-top: .25em;
+.track-search-result .track-info {
+    min-width: 0;
 }
-.track-artist {
-    font-size: .75em;
+.track-search-result .track-name {
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.track-search-result .track-artist {
+    font-size: .8em;
+    color: var(--muted);
 }
