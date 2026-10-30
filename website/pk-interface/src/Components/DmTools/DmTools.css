@@ -1,0 +1,161 @@
+.dmtools-card {
+    flex: 0 0 auto;
+    margin-top: auto;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: .75em;
+    padding: .7em .9em;
+    background-color: var(--card);
+    border: 1px solid var(--panel-border);
+    border-radius: 14px;
+    cursor: pointer;
+}
+/* Only the first card pushes itself to the bottom, the ones after it stack right below */
+.dmtools-card ~ .dmtools-card {
+    margin-top: 0;
+}
+.dmtools-card:active {
+    background-color: var(--card-hi);
+}
+.dmtools-title {
+    font-size: .72em;
+    font-weight: 700;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--muted);
+}
+.dmtools-state {
+    font-size: .95em;
+    font-weight: 600;
+    text-align: right;
+    color: var(--muted);
+}
+.dmtools-state-linked {
+    color: var(--accent);
+}
+.dmtools-state-pairing {
+    color: var(--text);
+    letter-spacing: .08em;
+}
+
+.dmtools-dialog {
+    position: fixed;
+    top: var(--edge);
+    left: var(--edge);
+    right: var(--edge);
+    bottom: var(--edge);
+    z-index: 999;
+    display: flex;
+    flex-direction: column;
+    background: radial-gradient(500px 300px at 90% 0%, rgba(34, 214, 107, .1), transparent 70%), var(--surface);
+    border: 1px solid var(--panel-border);
+    border-radius: var(--radius);
+    color: var(--text);
+    overflow: hidden;
+}
+/* The on-screen keyboard takes the lower part of the display */
+.dmtools-dialog.kbd-open {
+    bottom: calc(var(--edge) + 270px);
+}
+.dmtools-header {
+    flex: 0 0 auto;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 18px;
+}
+.dmtools-heading {
+    font-size: .72em;
+    font-weight: 700;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--muted);
+}
+.dmtools-close,
+.dmtools-button {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 48px;
+    padding: 0 22px;
+    background-color: var(--card);
+    border: 1px solid var(--panel-border);
+    border-radius: 24px;
+    font-weight: 600;
+    cursor: pointer;
+}
+.dmtools-close:active,
+.dmtools-button:active {
+    background-color: var(--card-hi);
+}
+.dmtools-button {
+    background-color: var(--accent-dim);
+    border-color: var(--accent);
+}
+.dmtools-button-quiet {
+    background-color: var(--card);
+    border-color: var(--panel-border);
+}
+.dmtools-body {
+    flex: 1 1 auto;
+    min-height: 0;
+    padding: 0 18px 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    overflow-y: auto;
+}
+.dmtools-info {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    color: var(--text);
+}
+.dmtools-code {
+    font-size: 3.2em;
+    font-weight: 700;
+    letter-spacing: .12em;
+    color: var(--accent);
+    text-align: center;
+    user-select: text;
+}
+.dmtools-label {
+    font-size: .72em;
+    font-weight: 700;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--muted);
+}
+.dmtools-row {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+}
+.dmtools-input {
+    flex: 1 1 auto;
+    min-width: 0;
+    height: 48px;
+    padding: 0 18px;
+    border: 1px solid var(--panel-border);
+    outline: none;
+    border-radius: 24px;
+    background: var(--card);
+    font-size: 1.1em;
+    color: var(--text);
+    transition: border-color 150ms, box-shadow 150ms;
+}
+.dmtools-input::placeholder {
+    color: var(--muted);
+}
+.dmtools-input:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-glow);
+}
+.dmtools-error {
+    color: #ff7a7a;
+    font-size: .9em;
+}
