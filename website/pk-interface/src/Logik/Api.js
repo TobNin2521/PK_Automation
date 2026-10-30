@@ -41,4 +41,31 @@ const SetLed = async (id, change) => {
     return res.data;
 };
 
-export {GetLed, SetLed, SearchTracks, SearchPlaylists, AddTrack, MoveTrack, SetPlaylist, NextTrack, GetToken};
+// Link to DM Tools (server/dmtools.js). The server only answers these on its own display, anywhere else they fail.
+// The state is {url, state: off|pairing|linked|offline, code, codeExpires, userId, lastSync, error}
+const GetDmTools = async () => {
+    const res = await axios.get(ADDRESS + "/api/dmtools");
+    return res.data;
+};
+// Sets the address of DM Tools and answers the new state
+const SetDmToolsUrl = async (url) => {
+    const res = await axios.post(ADDRESS + "/api/dmtools", { url: url });
+    return res.data;
+};
+// Forgets the address, the controller can be paired again
+const ResetDmTools = async () => {
+    await axios.delete(ADDRESS + "/api/dmtools");
+};
+
+// Addresses of the LED devices, [{id, name, address}]. Like DM Tools only answered on the display of the server
+const GetLedEndpoints = async () => {
+    const res = await axios.get(ADDRESS + "/api/leds/endpoints");
+    return res.data.endpoints;
+};
+// Points one LED device to a new address and answers all endpoints
+const SetLedEndpoint = async (id, address) => {
+    const res = await axios.post(ADDRESS + "/api/leds/endpoints/" + id, { address: address });
+    return res.data.endpoints;
+};
+
+export {GetLedEndpoints, SetLedEndpoint, GetLed, SetLed, SearchTracks, SearchPlaylists, AddTrack, MoveTrack, SetPlaylist, NextTrack, GetToken, GetDmTools, SetDmToolsUrl, ResetDmTools};

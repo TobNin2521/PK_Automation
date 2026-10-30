@@ -111,6 +111,11 @@ spotify.registerAuthRoutes(app, () => player.onLogin());
 registerMusicApi(app);
 // The login of the last run is still valid, no need to wait for a browser to log in again
 if (spotify.isLoggedIn()) player.onLogin();
+// LED addresses that were changed on the display
+require("./leds").loadAddresses();
+
+// Link to DM Tools, only runs when it has been set up (dmtools.js)
+require("./dmtools").start();
 
 const allowedOrigins = ['www.example1.com', 'www.example2.com', 'http://localhost:3000', 'http://localhost:8080', "http://192.168.56.1:3000", "http://192.168.56.1:8080", "https://127.0.0.1:8443"];
 app.use(cors({
