@@ -137,8 +137,9 @@ remote URL stays clean and the scripts never print the token. `pk-update.sh --to
 given as a parameter is visible to other users of the Pi in the process list while the script runs.
 
 Common parameters: `pk-clone.sh` `--repo --target --branch --token`, `pk-update.sh` `--branch --token --force-build
---retries --node-memory`, `pk-start.sh` `--browser kiosk|headless|none --display --url --browser-bin --server-wait`.
-`headless` runs the browser without a window, so nothing is shown on the display.
+--retries --node-memory`, `pk-start.sh` `--browser kiosk|headless|none --wayland --display --url --browser-bin --server-wait`.
+`headless` runs the browser without a window, so nothing is shown on the display. The browser opens on the Wayland
+socket `wayland-1` (labwc); `--wayland ""` uses X11 with `--display` instead.
 
 Start it when the desktop starts (it needs the display):
 

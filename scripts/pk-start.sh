@@ -16,7 +16,8 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"   # --root           the
 URL="https://127.0.0.1:8443"                              # --url            address of the website
 BROWSER_MODE="kiosk"                                      # --browser        kiosk, headless (no window, nothing on the display) or none
 BROWSER_BIN=""                                            # --browser-bin    Chromium to use, empty = find one
-DISPLAY_NAME=":0"                                         # --display        the display the browser opens on
+WAYLAND_NAME="wayland-1"                                  # --wayland        Wayland socket of the desktop (Raspberry Pi OS labwc), empty = use X11 with --display
+DISPLAY_NAME=":0"                                         # --display        the X11 display, only used when --wayland is empty
 PROFILE_DIR=""                                            # --browser-profile  profile of the browser, empty = .browser-profile in the project
 SERVER_WAIT=60                                            # --server-wait    seconds to wait for the server
 BROWSER_DELAY=3                                           # --browser-delay  seconds before the browser is started again
@@ -24,18 +25,19 @@ BROWSER_DELAY=3                                           # --browser-delay  sec
 usage() {
     sed -n '2,/^$/p' "${BASH_SOURCE[0]}" | sed 's/^# \{0,1\}//'
     echo "Parameters (defaults): --root \"$ROOT\" --url $URL --browser $BROWSER_MODE --browser-bin \"\""
-    echo "                      --display $DISPLAY_NAME --browser-profile \"\" --server-wait $SERVER_WAIT --browser-delay $BROWSER_DELAY"
+    echo "                      --wayland "$WAYLAND_NAME" --display $DISPLAY_NAME --browser-profile \"\" --server-wait $SERVER_WAIT --browser-delay $BROWSER_DELAY"
 }
 
 while [ $# -gt 0 ]; do
     case "$1" in
-        --root|--url|--browser|--browser-bin|--display|--browser-profile|--server-wait|--browser-delay)
+        --root|--url|--browser|--browser-bin|--wayland|--display|--browser-profile|--server-wait|--browser-delay)
             if [ $# -lt 2 ]; then echo "$1 needs a value" >&2; exit 2; fi
             case "$1" in
                 --root) ROOT="$2" ;;
                 --url) URL="$2" ;;
                 --browser) BROWSER_MODE="$2" ;;
                 --browser-bin) BROWSER_BIN="$2" ;;
+                --wayland) WAYLAND_NAME="$2" ;;
                 --display) DISPLAY_NAME="$2" ;;
                 --browser-profile) PROFILE_DIR="$2" ;;
                 --server-wait) SERVER_WAIT="$2" ;;
@@ -101,13 +103,19 @@ browser_loop() {
         --check-for-update-interval=31536000 --password-store=basic
         --overscroll-history-navigation=0 --disable-pinch
     )
+    # Native Wayland: through XWayland a kiosk window may never be shown (labwc)
+    local -a display_env=(DISPLAY="$DISPLAY_NAME")
+    if [ -n "$WAYLAND_NAME" ]; then
+        display_env=(WAYLAND_DISPLAY="$WAYLAND_NAME" XDG_RUNTIME_DIR="${XDG_RUNTIME_DIR:-/run/user/$(id -u)}")
+        flags+=(--ozone-platform=wayland)
+    fi
     if [ "$BROWSER_MODE" = "headless" ]; then
         flags+=(--headless=new --disable-gpu --remote-debugging-port=9222)
     else
         flags+=(--kiosk)
     fi
     while true; do
-        DISPLAY="$DISPLAY_NAME" "$browser" "${flags[@]}" "$URL"
+        env "${display_env[@]}" "$browser" "${flags[@]}" "$URL"
         log "The browser closed, starting it again in $BROWSER_DELAY seconds"
         sleep "$BROWSER_DELAY"
     done
@@ -118,7 +126,7 @@ start_browser() {
     local browser
     browser="$(find_browser)" || { log "No Chromium found (sudo apt install chromium-browser), open $URL yourself"; return 0; }
     # The screen stays on while nobody touches it
-    if [ "$BROWSER_MODE" = "kiosk" ] && command -v xset > /dev/null; then
+    if [ "$BROWSER_MODE" = "kiosk" ] && [ -z "$WAYLAND_NAME" ] && command -v xset > /dev/null; then
         DISPLAY="$DISPLAY_NAME" xset s off -dpms s noblank 2>/dev/null || true
     fi
     log "Opening $URL in $browser ($BROWSER_MODE)"
