@@ -8,18 +8,23 @@ export const Automation = ({}) => {
 
     return (
         <div className="automation">
-            <Relay name={"Bar Licht"} pin={33} />
-            <Relay name={"Led"} pin={35}>
-                {/* The ids and the addresses of the LED devices are configured in server/leds.js */}
-                <LedControl id='bar' name='Bar' />
-                <LedControl id='wand' name='Wand' />
-            </Relay>
-            <Relay name={"Regale"} pin={37} />
-            <Relay name={"Wand"} pin={38} />
-            {/* Pairing with DM Tools, only shows on the display of the server */}
-            <DmTools />
-            {/* The addresses of the LED devices, also only on the display of the server */}
-            <LedEndpoints />
+            <div className="automation-list">
+                <Relay name={"Bar Licht"} pin={33} />
+                <Relay name={"Led"} pin={35}>
+                    {/* The ids and the addresses of the LED devices are configured in server/leds.js */}
+                    <LedControl id='bar' name='Bar' />
+                    <LedControl id='wand' name='Wand' />
+                </Relay>
+                <Relay name={"Regale"} pin={37} />
+                <Relay name={"Wand"} pin={38} />
+            </div>
+            {/* Always pinned below the scrolling list, in front of it */}
+            <div className="automation-footer">
+                {/* Pairing with DM Tools, only shows on the display of the server */}
+                <DmTools />
+                {/* The addresses of the LED devices, also only on the display of the server */}
+                <LedEndpoints />
+            </div>
         </div>
     );
 };
