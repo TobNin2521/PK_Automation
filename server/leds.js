@@ -15,8 +15,11 @@ const events = new EventEmitter();
 // The WLED devices, the id is used by the api and the website
 const devices = [
     { id: "bar", name: "Bar", address: "http://192.168.178.107" },
-    { id: "wand", name: "Wand", address: "http://192.168.178.66" }
+    { id: "wand", name: "Wand", address: "http://192.168.178.84" }
 ];
+
+// Addresses changed on the display of the server are kept in settings.json and replace the ones above
+const ADDRESS_KEY = "ledAddresses";
 
 const TIMEOUT = 2500;
 const DEFAULT_COLOR = [255, 0, 0];
@@ -34,6 +37,47 @@ const findDevice = (id) => {
     const device = devices.find(d => d.id === id);
     if (!device) throw codedError("Unknown LED device", "NOT_FOUND");
     return device;
+};
+
+// Loaded when first needed, like the store in dmtools.js
+const savedAddresses = () => require("./store").settings.get(ADDRESS_KEY, null) || {};
+
+// Applies the saved addresses to the devices, called once at startup
+const loadAddresses = () => {
+    const saved = savedAddresses();
+    devices.forEach(d => {
+        if (typeof saved[d.id] === "string") d.address = saved[d.id];
+    });
+};
+
+// An address of a WLED device without path, e.g. "192.168.178.107" or "http://wled.local"
+const cleanAddress = (input) => {
+    const text = typeof input === "string" ? input.trim() : "";
+    let parsed = null;
+    try {
+        parsed = new URL(/^[a-z]+:\/\//i.test(text) ? text : "http://" + text);
+    }
+    catch (err) {
+        throw new RangeError("address must be the address of a WLED device");
+    }
+    if (parsed.protocol !== "http:" && parsed.protocol !== "https:") {
+        throw new RangeError("address must start with http:// or https://");
+    }
+    if (parsed.hostname === "") throw new RangeError("address must be the address of a WLED device");
+    return parsed.origin;
+};
+
+const getEndpoints = () => devices.map(d => ({ id: d.id, name: d.name, address: d.address }));
+
+// Points a device to a new address. The effect list is loaded again since it may be another kind of device
+const setAddress = (id, address) => {
+    const device = findDevice(id);
+    device.address = cleanAddress(address);
+    delete effectCache[device.id];
+    const store = require("./store");
+    store.settings.set(ADDRESS_KEY, Object.assign({}, savedAddresses(), { [device.id]: device.address }));
+    store.settings.flush();
+    return getEndpoints();
 };
 
 const request = async (device, path, body) => {
@@ -147,6 +191,9 @@ const setLed = async (id, change) => {
 module.exports = {
     events,
     devices,
+    loadAddresses,
+    getEndpoints,
+    setAddress,
     getLed,
     getLeds,
     setLed,

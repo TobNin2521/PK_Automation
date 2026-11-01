@@ -82,6 +82,41 @@ hash of the id (`server/data/users.json`).
 Names are unique per user (not case sensitive), a user can have 50 profiles. Applying a profile whose playlist is
 already selected doesn't restart the music, an LED that can't be reached is reported as failed and doesn't stop the rest.
 
+## DM Tools
+
+A game master can switch the profiles of one user from [DM Tools](https://github.com/TobNin2521/DMTools) (settings page
+and encounter runner) and save the current lighting as a new profile there. The server calls DM Tools, DM Tools never
+calls the server: so nothing has to be opened on the network, it works over the internet and no mDNS is needed
+(`server/dmtools.js`). Nothing has to be typed on the Pi over ssh, pairing happens on its own display.
+
+Every 2 seconds the server sends DM Tools the profiles of its user (id and name) and the profile it applied last, the
+answer says what the game master asked for: switching to a profile (the same code as `POST /api/profiles/:id/apply`) or
+saving the current playlist and LEDs under a new name (`POST /api/profiles` with `fromCurrent: true`). The server
+confirms it with the next call. A DM Tools that can't be reached is only logged and asked again later, the rest of the
+server doesn't depend on it.
+
+**Pairing.** The server makes up its own token and its own user (kept in `server/data/secrets.json`). When DM Tools doesn't
+know the token yet, the server asks it for a code and shows it in the **DM Tools** card at the bottom of the left panel of
+the website (tap it for the big code). The game master types the code in DM Tools under Settings, PK Automation, Pair a
+controller, and the link is up. When the controller is removed in DM Tools the card shows a new code.
+
+The server needs the address of DM Tools. Either type it in the DM Tools card once, or set `DEFAULT_URL` at the top of
+`server/dmtools.js` so a Pi that updates itself pairs without anybody touching it. The card only shows on the display of
+the server itself (the browser on the Pi), never on a phone.
+
+The profiles DM Tools sees are the ones of the server's own user. Create more of them from DM Tools ("Save current
+lighting"), or with the profile api using that user's id, which the card endpoint answers on the Pi:
+
+| Endpoint | Description |
+| --- | --- |
+| `GET /api/dmtools` | State of the link: `{url, state, code, codeExpires, userId, lastSync, error}`, `state` is `off`, `pairing`, `linked` or `offline` |
+| `POST /api/dmtools` `{url}` | Set the address of DM Tools, answers the state |
+| `DELETE /api/dmtools` | Forget the address and the token, the controller can be paired again |
+
+These answer `403` to anything but the server itself (its own display), because the code and the user id decide who can
+switch the profiles and the rest of the api is open to the whole network. The server needs outbound access to DM Tools,
+nothing else.
+
 ## Finding the server (mDNS)
 
 The server announces itself on the local network as the service `_pkautomation._tcp` (`server/mdns.js`), so devices

@@ -1,6 +1,8 @@
 import { Relay } from "./Relay";
 import './Automation.css';
 import { LedControl } from "./LedControl";
+import { DmTools } from "../DmTools/DmTools";
+import { LedEndpoints } from "./LedEndpoints";
 
 export const Automation = ({}) => {
 
@@ -14,6 +16,10 @@ export const Automation = ({}) => {
             </Relay>
             <Relay name={"Regale"} pin={37} />
             <Relay name={"Wand"} pin={38} />
+            {/* Pairing with DM Tools, only shows on the display of the server */}
+            <DmTools />
+            {/* The addresses of the LED devices, also only on the display of the server */}
+            <LedEndpoints />
         </div>
     );
 };
