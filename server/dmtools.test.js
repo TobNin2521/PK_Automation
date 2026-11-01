@@ -231,6 +231,102 @@ describe("DM Tools link", () => {
         });
     });
 
+    describe("LEDs", () => {
+        let leds;
+        let effectLists;    // per device id, as WLED lists them (the index is the effect number)
+        let ledLink;
+
+        beforeEach(() => {
+            effectLists = {
+                bar: ["Solid", "Blink", "Breathe", "RSVD", "Candle", "Fire 2012"],
+                wand: ["Solid", "Blink", "Breathe", "Aurora"]
+            };
+            leds = {
+                devices: [{ id: "bar", name: "Bar" }, { id: "wand", name: "Wand" }],
+                getEffects: jest.fn(async (id) => {
+                    if (!effectLists[id]) throw new Error(id + " is not reachable");
+                    return effectLists[id];
+                }),
+                setLed: jest.fn(async () => ({}))
+            };
+            const fakeFetch = async (url, options) => {
+                const path = url.slice(URL.length);
+                calls.push({ path: path, headers: options.headers, body: JSON.parse(options.body) });
+                return { ok: true, status: 200, json: async () => syncReply };
+            };
+            ledLink = dmtools.create({ profiles: profiles, store: store, leds: leds, fetch: fakeFetch, log: () => {} });
+        });
+
+        afterEach(() => ledLink.stop());
+
+        test("Reports the effects of all devices, preferred ones first, without placeholders", async () => {
+            await ledLink.sync();
+            expect(syncCalls()[0].body.effects).toEqual(["Solid", "Breathe", "Candle", "Fire 2012", "Aurora", "Blink"]);
+        });
+
+        test("Reports at most 50 effects of up to 40 characters", async () => {
+            effectLists.bar = Array.from({ length: 120 }, (_, i) => "Effect " + i).concat(["x".repeat(41)]);
+            await ledLink.sync();
+            const reported = syncCalls()[0].body.effects;
+            expect(reported).toHaveLength(50);
+            expect(reported.every(name => name.length <= 40)).toBe(true);
+        });
+
+        test("Reads the effects only once a minute", async () => {
+            await ledLink.sync();
+            await ledLink.sync();
+            expect(leds.getEffects).toHaveBeenCalledTimes(2);   // once per device
+            expect(syncCalls()[1].body.effects).toHaveLength(6);
+        });
+
+        test("Reports no effects while no device can be reached", async () => {
+            effectLists = {};
+            await ledLink.sync();
+            expect(syncCalls()[0].body.effects).toBeUndefined();
+        });
+
+        test("Sets color, brightness and the effect by its number on each device, and confirms", async () => {
+            syncReply = {
+                command: { seq: 5, action: "leds", leds: { color: "#ff8800", brightness: 50, effect: "Breathe" } },
+                pollMs: 2000
+            };
+            await ledLink.sync();
+            await ledLink.sync();
+
+            expect(leds.setLed).toHaveBeenCalledTimes(2);
+            expect(leds.setLed).toHaveBeenCalledWith("bar", { on: true, color: [255, 136, 0], brightness: 128, effect: 2 });
+            expect(leds.setLed).toHaveBeenCalledWith("wand", { on: true, color: [255, 136, 0], brightness: 128, effect: 2 });
+            expect(profiles.apply).not.toHaveBeenCalled();
+            expect(syncCalls()[1].body.ack).toBe(5);
+        });
+
+        test("Without an effect the LEDs are solid, a device without the effect gets only the color", async () => {
+            syncReply = { command: { seq: 1, action: "leds", leds: { color: "#0000ff", brightness: 100 } }, pollMs: 2000 };
+            await ledLink.sync();
+            expect(leds.setLed).toHaveBeenCalledWith("bar", { on: true, color: [0, 0, 255], brightness: 255, effect: 0 });
+
+            syncReply = { command: { seq: 2, action: "leds", leds: { color: "#0000ff", brightness: 100, effect: "Candle" } }, pollMs: 2000 };
+            await ledLink.sync();
+            const second = Object.fromEntries(leds.setLed.mock.calls.slice(2).map(([id, change]) => [id, change.effect]));
+            expect(second).toEqual({ bar: 4, wand: 0 });
+        });
+
+        test("Brightness 0 switches the LEDs off", async () => {
+            syncReply = { command: { seq: 1, action: "leds", leds: { color: "#ffffff", brightness: 0 } }, pollMs: 2000 };
+            await ledLink.sync();
+            expect(leds.setLed).toHaveBeenCalledWith("bar", { on: false, color: [255, 255, 255], effect: 0 });
+        });
+
+        test("Confirms LED settings even when a device is offline", async () => {
+            leds.setLed.mockRejectedValueOnce(new Error("Bar is not reachable"));
+            syncReply = { command: { seq: 7, action: "leds", leds: { color: "#ffffff", brightness: 80 } }, pollMs: 2000 };
+            await ledLink.sync();
+            await ledLink.sync();
+            expect(leds.setLed).toHaveBeenCalledTimes(2);
+            expect(syncCalls()[1].body.ack).toBe(7);
+        });
+    });
+
     describe("address", () => {
         test("Keeps only the origin of the address and starts the link", () => {
             store.settings.delete("dmtoolsUrl");

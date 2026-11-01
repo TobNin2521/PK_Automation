@@ -131,6 +131,11 @@ const getLed = async (id) => {
     return readState(findDevice(id));
 };
 
+// The effect names of a device, the index of a name is its effect number
+const getEffects = async (id) => {
+    return readEffects(findDevice(id));
+};
+
 // All devices, one that can't be reached is reported as offline
 const getLeds = async () => {
     return Promise.all(devices.map(device => readState(device).catch(err => {
@@ -196,6 +201,7 @@ module.exports = {
     setAddress,
     getLed,
     getLeds,
+    getEffects,
     setLed,
     parseChange
 };

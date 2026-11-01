@@ -39,6 +39,36 @@ const PAIRING_POLL = 5000;      // while waiting for the game master to type the
 const RENEW_BEFORE = 30000;     // a code that expires within this time is replaced
 const REQUEST_TIMEOUT = 10000;
 
+// LED effects reported to DM Tools, which takes at most MAX_EFFECTS names of up to MAX_EFFECT_NAME characters
+const MAX_EFFECTS = 50;
+const MAX_EFFECT_NAME = 40;
+const EFFECTS_REFRESH = 60000;  // the list hardly changes, it is read again after this time
+const EFFECTS_RETRY = 15000;    // while no device could be read
+// WLED has far more effects than DM Tools takes: these come first, the rest fill up in the order of the devices
+const PREFERRED_EFFECTS = [
+    "Solid", "Breathe", "Candle", "Candle Multi", "Fire 2012", "Fire Flicker", "Aurora", "Lightning",
+    "Twinkle", "Twinklefox", "Sparkle", "Fade", "Colorloop", "Rainbow", "Lake", "Pacifica", "Plasma",
+    "Ripple", "Fireworks", "Meteor", "Dissolve", "Scanner", "Strobe", "Halloween", "Flow"
+];
+// Placeholders in the WLED effect list, not effects
+const NOT_EFFECTS = ["RSVD", "-"];
+
+// "#ff8800" -> [255, 136, 0]
+const hexToRgb = (hex) => [1, 3, 5].map(i => parseInt(hex.slice(i, i + 2), 16));
+
+// The effect names to report: cleaned, unique, the preferred ones first, at most MAX_EFFECTS
+const pickEffects = (names) => {
+    let unique = [];
+    names.forEach(name => {
+        const clean = String(name).trim();
+        if (clean === "" || clean.length > MAX_EFFECT_NAME || NOT_EFFECTS.includes(clean)) return;
+        if (!unique.includes(clean)) unique.push(clean);
+    });
+    const preferred = PREFERRED_EFFECTS.filter(name => unique.includes(name));
+    const rest = unique.filter(name => !preferred.includes(name));
+    return preferred.concat(rest).slice(0, MAX_EFFECTS);
+};
+
 // An address of DM Tools without path, as the origin of the page the game master uses
 const cleanUrl = (url) => {
     let parsed = null;
@@ -61,6 +91,7 @@ const formatCode = (code) => code.slice(0, 4) + "-" + code.slice(4);
  * deps: {
  *   profiles   the profiles module (createUser, list, create, apply)
  *   store      the store module (settings, secrets)
+ *   leds       the leds module (devices, getEffects, setLed), optional: without it no LEDs are set directly
  *   fetch      defaults to the global fetch (Node 18 or newer, as in leds.js)
  *   log
  * }
@@ -68,8 +99,12 @@ const formatCode = (code) => code.slice(0, 4) + "-" + code.slice(4);
 const create = (deps) => {
     const profiles = deps.profiles;
     const store = deps.store;
+    const leds = deps.leds || null;
     const request = deps.fetch || fetch;
     const log = deps.log || (() => {});
+
+    let effects = [];           // the effect names last reported
+    let effectsAt = 0;          // when they were read
 
     let state = "off";          // off, pairing (waiting for the code to be typed), linked, offline
     let pairing = null;         // { code, expires } while state is "pairing"
@@ -156,6 +191,47 @@ const create = (deps) => {
         }
     };
 
+    // The effects the LED devices offer. A device that can't be reached is skipped; when none answers the last
+    // list is kept, so the effects don't vanish from DM Tools while a device restarts
+    const readEffects = async () => {
+        const wait = effects.length > 0 ? EFFECTS_REFRESH : EFFECTS_RETRY;
+        if (effectsAt > 0 && Date.now() - effectsAt < wait) return effects;
+        const lists = await Promise.all(leds.devices.map(device => leds.getEffects(device.id).catch(() => [])));
+        const picked = pickEffects([].concat(...lists));
+        if (picked.length > 0) effects = picked;
+        effectsAt = Date.now();
+        return effects;
+    };
+
+    // Sets color, brightness and effect on every LED device. No effect is "Solid", brightness 0 switches them
+    // off. A device that lacks the effect gets the color without it. Never throws either
+    const ledsRequested = async (requested) => {
+        if (!requested || typeof requested.color !== "string" || !/^#[0-9a-fA-F]{6}$/.test(requested.color)) {
+            log("DM Tools sent LED settings that can't be used");
+            return;
+        }
+        const percent = Math.min(100, Math.max(0, Number(requested.brightness) || 0));
+        const brightness = Math.round(percent * 255 / 100);
+        const wanted = typeof requested.effect === "string" ? requested.effect.trim() : "";
+        log("DM Tools sets the LEDs to " + requested.color + ", " + percent + "%" + (wanted ? ", " + wanted : ""));
+
+        await Promise.all(leds.devices.map(async device => {
+            try {
+                let change = { on: brightness > 0, color: hexToRgb(requested.color), effect: 0 };
+                if (brightness > 0) change.brightness = brightness;
+                if (wanted !== "") {
+                    const index = (await leds.getEffects(device.id)).findIndex(name => String(name).trim() === wanted);
+                    if (index >= 0) change.effect = index;
+                    else log(device.name + " has no effect " + wanted);
+                }
+                await leds.setLed(device.id, change);
+            }
+            catch (err) {
+                log("DM Tools LEDs: " + err.message);
+            }
+        }));
+    };
+
     // DM Tools doesn't know this server (yet): get a code to show, unless the last one still holds
     const register = async (base, token) => {
         if (pairing !== null && pairing.expires - Date.now() > RENEW_BEFORE) return;
@@ -182,6 +258,10 @@ const create = (deps) => {
         let body = { profiles: list };
         if (active !== null && list.some(p => p.id === active)) body.active = active;
         if (ack > 0) body.ack = ack;
+        if (leds !== null) {
+            const names = await readEffects();
+            if (names.length > 0) body.effects = names;
+        }
 
         let reply = null;
         try {
@@ -202,7 +282,9 @@ const create = (deps) => {
         const command = reply.command;
         if (command && command.seq > ack) {
             if (command.action === "save") await saveRequested(id, command.name);
-            else await applyRequested(id, command.profile);
+            else if (command.action === "apply" || command.action === undefined) await applyRequested(id, command.profile);
+            else if (command.action === "leds" && leds !== null) await ledsRequested(command.leds);
+            else log("DM Tools asks for something this server can't do: " + command.action);
             ack = command.seq;
         }
         pollMs = Math.min(MAX_POLL, Math.max(MIN_POLL, Number(reply.pollMs) || DEFAULT_POLL));
@@ -300,6 +382,7 @@ const link = () => {
         instance = create({
             profiles: require("./profiles"),
             store: require("./store"),
+            leds: require("./leds"),
             log: (message) => console.log(message)
         });
     }
