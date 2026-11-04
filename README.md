@@ -156,7 +156,7 @@ script and is changed with a parameter (`--help` lists them).
 | --- | --- |
 | `pk-clone.sh` | Once, clones the repository onto the Pi. Contains the GitHub token, so it is **not in git** (see `.gitignore`), copy it to the Pi with `scp`. |
 | `pk-update.sh` | Pulls the newest version of the branch, installs the packages when a `package-lock.json` changed and builds the frontend when its files changed. A failed build keeps the previous one. Exit code 1 means a problem, what is installed can still be started. |
-| `pk-start.sh` | Starts the server and opens the website in Chromium (fullscreen for the touch display, not started again once it is closed). Runs as long as the server does, stop it with Ctrl+C. |
+| `pk-start.sh` | Starts the server and opens the website in Chromium (fullscreen for the touch display, not started again once it is closed). Runs as long as the server does, stop it with Ctrl+C. Started again while it runs, it stops the running one (server and browser) and takes its place. |
 
 ```
 sudo apt install git chromium-browser          # once, Node.js 18 or newer is needed as well
@@ -172,7 +172,7 @@ remote URL stays clean and the scripts never print the token. `pk-update.sh --to
 given as a parameter is visible to other users of the Pi in the process list while the script runs.
 
 Common parameters: `pk-clone.sh` `--repo --target --branch --token`, `pk-update.sh` `--branch --token --force-build
---retries --node-memory`, `pk-start.sh` `--browser fullscreen|headless|none --wayland --display --url --browser-bin --server-wait`.
+--retries --node-memory`, `pk-start.sh` `--browser fullscreen|headless|none --wayland --display --url --browser-bin --server-wait --stop-wait`.
 `headless` runs the browser without a window, so nothing is shown on the display. The browser opens on the Wayland
 socket `wayland-1` (labwc); `--wayland ""` uses X11 with `--display` instead.
 

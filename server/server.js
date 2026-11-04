@@ -128,6 +128,13 @@ app.use(cors({
 
 }));
 
+// A port in use most likely means the server is already running: say so and stop, instead of an unhandled error
+const listenFailed = (err) => {
+    if (err.code === "EADDRINUSE") console.error("Port " + HTTP_PORT + " is already in use, is the server already running?");
+    else console.error("The web server could not start: " + err.message);
+    process.exit(1);
+};
+
 if (__useSSL) {
     var server = https.createServer({
         key: fs.readFileSync('./ssl/cert.key'),
@@ -140,6 +147,7 @@ if (__useSSL) {
         console.log("***********************************************************************");
         mdns.publish(HTTP_PORT, true);
     });
+    server.on("error", listenFailed);
 }
 else {
     let server = http.createServer(app).listen(HTTP_PORT, function () {
@@ -150,4 +158,5 @@ else {
         console.log("***********************************************************************");
         mdns.publish(HTTP_PORT, false);
     });
+    server.on("error", listenFailed);
 }

@@ -8,3 +8,6 @@ scripts/pk-clone.sh
 
 # Profile of the browser that shows the website on the Pi
 .browser-profile/
+
+# PID of the running pk-start.sh
+.pk-start.pid
