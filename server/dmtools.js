@@ -48,7 +48,9 @@ const EFFECTS_RETRY = 15000;    // while no device could be read
 const PREFERRED_EFFECTS = [
     "Solid", "Breathe", "Candle", "Candle Multi", "Fire 2012", "Fire Flicker", "Aurora", "Lightning",
     "Twinkle", "Twinklefox", "Sparkle", "Fade", "Colorloop", "Rainbow", "Lake", "Pacifica", "Plasma",
-    "Ripple", "Fireworks", "Meteor", "Dissolve", "Scanner", "Strobe", "Halloween", "Flow"
+    "Ripple", "Fireworks", "Meteor", "Dissolve", "Scanner", "Strobe", "Halloween", "Flow",
+    // used by the example LED presets of DM Tools (src/features/pk/lib/led-presets.ts)
+    "Chase", "Fire Flicker", "Colortwinkles", "Sunrise"
 ];
 // Placeholders in the WLED effect list, not effects
 const NOT_EFFECTS = ["RSVD", "-"];

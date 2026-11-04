@@ -26,6 +26,30 @@ const DEFAULT_COLOR = [255, 0, 0];
 
 // The effect list of a device doesn't change, it is only loaded once
 const effectCache = {};
+// The metadata of the effects (/json/fxdata), same order as the names, also loaded once
+const fxDataCache = {};
+
+// The effect parameters as WLED starts them when no effect asks for others. They are sent with every
+// effect so that it doesn't inherit what the effect before it left: Fire 2012 with the cooling of another
+// effect only burns on the first part of the strip.
+const BASE_PARAMETERS = { sx: 128, ix: 128, c1: 128, c2: 128, c3: 16, o1: false, o2: false, o3: false, pal: 0 };
+const NUMBER_PARAMETERS = ["sx", "ix", "c1", "c2", "c3", "pal"];
+const FLAG_PARAMETERS = ["o1", "o2", "o3"];
+
+// The defaults of an effect from its metadata, e.g. "Cooling,Spark rate,,,Boost;;!;1;sx=64,ix=160,m12=1"
+// -> { sx: 64, ix: 160 }. The fifth part holds them; mapping keys for 2D matrices (m12) are left out.
+const parseDefaults = (data) => {
+    const parts = String(data || "").replace(/^@/, "").split(";");
+    let defaults = {};
+    (parts[4] || "").split(",").forEach(pair => {
+        const [key, text] = pair.split("=");
+        const value = Number(text);
+        if (!Number.isInteger(value) || value < 0 || value > 255) return;
+        if (NUMBER_PARAMETERS.includes(key)) defaults[key] = value;
+        else if (FLAG_PARAMETERS.includes(key)) defaults[key] = value !== 0;
+    });
+    return defaults;
+};
 
 const codedError = (message, code) => {
     let err = new Error(message);
@@ -74,6 +98,7 @@ const setAddress = (id, address) => {
     const device = findDevice(id);
     device.address = cleanAddress(address);
     delete effectCache[device.id];
+    delete fxDataCache[device.id];
     const store = require("./store");
     store.settings.set(ADDRESS_KEY, Object.assign({}, savedAddresses(), { [device.id]: device.address }));
     store.settings.flush();
@@ -103,6 +128,21 @@ const readEffects = async (device) => {
         effectCache[device.id] = effects.map(name => String(name).split("@")[0]);
     }
     return effectCache[device.id];
+};
+
+// The parameters to send with an effect: the WLED base values, then the defaults of the effect. Older firmware
+// has no /json/fxdata but appends the metadata to the name in /json/eff
+const effectParameters = async (device, index) => {
+    if (!fxDataCache[device.id]) {
+        try {
+            fxDataCache[device.id] = await request(device, "/json/fxdata");
+        }
+        catch (err) {
+            const names = await request(device, "/json/eff");
+            fxDataCache[device.id] = names.map(name => String(name).split("@")[1] || "");
+        }
+    }
+    return Object.assign({}, BASE_PARAMETERS, parseDefaults(fxDataCache[device.id][index]));
 };
 
 const readState = async (device) => {
@@ -183,7 +223,16 @@ const setLed = async (id, change) => {
     if (parsed.on !== undefined) wled.on = parsed.on;
     if (parsed.brightness !== undefined) wled.bri = parsed.brightness;
     if (parsed.color !== undefined) segment.col = [parsed.color];
-    if (parsed.effect !== undefined) segment.fx = parsed.effect;
+    if (parsed.effect !== undefined) {
+        segment.fx = parsed.effect;
+        // Without its parameters the effect keeps those of the one before; it still runs, only not as meant
+        try {
+            Object.assign(segment, await effectParameters(device, parsed.effect));
+        }
+        catch (err) {
+            console.log(device.name + ": no parameters for effect " + parsed.effect + " (" + err.message + ")");
+        }
+    }
     if (Object.keys(segment).length > 0) wled.seg = [segment];
     if (Object.keys(wled).length === 0) throw new RangeError("Nothing to change");
 
@@ -203,5 +252,6 @@ module.exports = {
     getLeds,
     getEffects,
     setLed,
-    parseChange
+    parseChange,
+    parseDefaults
 };
